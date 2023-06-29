@@ -360,3 +360,5 @@ func addFieldAfterTag(filePath, tag, fieldName, fieldType, commentStr string) er
 
 	return nil
 }
+
+//TEST
