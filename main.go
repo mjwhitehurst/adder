@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -101,6 +102,12 @@ func printHelp() {
 	fmt.Println("                <3> Field Type (int)   ")
 	fmt.Println("                <4> Optional Comment   ")
 	fmt.Println("                                       ")
+	fmt.Println("   ADD_NONDB_FIELD                     ")
+	fmt.Println("       Options: <1> Database (TM)      ")
+	fmt.Println("                <2> Field Name (Flag1) ")
+	fmt.Println("                <3> Field Type (int)   ")
+	fmt.Println("                <4> Optional Comment   ")
+	fmt.Println("                                       ")
 	fmt.Println("                                       ")
 	fmt.Println("***************************************")
 
@@ -128,7 +135,7 @@ func actionFromString(arg string) int {
 /**
  *
  */
-func addDatabaseField(tag string) {
+func addDatabaseField(tag string, nonDb bool) {
 
 	if len(os.Args) < 4 {
 		fmt.Println("Invalid number of arguments - use --help to find out more")
@@ -178,7 +185,7 @@ func addDatabaseField(tag string) {
 	fmt.Println("file: ", definitionsFile, " field name: ", fieldName, " field type: ", fieldType, " comment: ", commentStr)
 
 	//At this point we have a file, and we know what we want to put into it.
-	err := addFieldAfterTag(definitionsFile, tag, fieldName, fieldType, commentStr)
+	err := addFieldAfterTag(definitionsFile, nonDb, tag, fieldName, fieldType, commentStr)
 	if err != nil {
 		fmt.Println("Error adding field: ", err)
 	}
@@ -186,16 +193,17 @@ func addDatabaseField(tag string) {
 } /* addDatabaseField */
 
 func addRecField() {
-	addDatabaseField("ADDER REC START")
+	addDatabaseField("ADDER REC START", false)
 }
 
 func addMemField() {
-	addDatabaseField("ADDER MEM START")
+	addDatabaseField("ADDER MEM START", false)
 	return
 }
 
 func addNonDbField() {
 	//TODO: like addDatabaseField, but add the whole thing as a comment
+	addDatabaseField("ADDER NONDB START", true)
 	return
 }
 
@@ -270,9 +278,16 @@ func findDbDefinitionsFileInDir(dbName string, dirName string) string {
 	}
 } /* findDbDefinitionsFileInDir */
 
-func addFieldAfterTag(filePath, tag, fieldName, fieldType, commentStr string) error {
+func addFieldAfterTag(
+	filePath string,
+	nonDb bool,
+	tag string,
+	fieldName string,
+	fieldType string,
+	commentStr string) error {
+
 	// Create a temporary file
-	tempFilePath := filePath + ".tmp"
+	tempFilePath := filePath + ".addertmp"
 	tempFile, err := os.Create(tempFilePath)
 	if err != nil {
 		return err
@@ -299,13 +314,22 @@ func addFieldAfterTag(filePath, tag, fieldName, fieldType, commentStr string) er
 			foundTag = true
 
 			// Insert the new line with field details after the tag
-			newLine := fmt.Sprintf("    %s %s // %s\n", fieldType, fieldName, commentStr)
+			newLine := ""
+			if nonDb {
+				newLine = fmt.Sprintf("  /* DEFNONDBFIELD %s %s; */ // %s\n", fieldType, fieldName, commentStr)
+			} else {
+				newLine = fmt.Sprintf("  %s %s // %s\n", fieldType, fieldName, commentStr)
+			}
 			writer.WriteString(newLine)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
 		return err
+	}
+
+	if !foundTag {
+		return errors.New("UNABLE TO FIND TAG IN FILE")
 	}
 
 	if err := writer.Flush(); err != nil {
@@ -343,4 +367,4 @@ func addFieldAfterTag(filePath, tag, fieldName, fieldType, commentStr string) er
 	}
 
 	return nil
-}
+} /* findDbDefinitionsFileInDir */
