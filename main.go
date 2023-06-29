@@ -2,13 +2,10 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"fmt"
-	"math"
 	"os"
 	"path/filepath"
 	"strings"
-	"syscall"
 )
 
 // Define all the actions here
@@ -330,35 +327,20 @@ func addFieldAfterTag(filePath, tag, fieldName, fieldType, commentStr string) er
 		return err
 	}
 
-	// Get the original file info (owner and permissions)
-	fileInfo, err := os.Stat(filePath)
-	if err != nil {
-		return err
-	}
-
 	// Get the original owner
-	originalOwnerUint := fileInfo.Sys().(*syscall.Stat_t).Gid
-
-	fmt.Println(" uint og owner: ", originalOwnerUint)
-
-	// -1 will tell chown to do nothing
-	originalOwner := -1
-
-	//quick check
-	if originalOwnerUint <= math.MaxInt32 {
-		originalOwner = int(originalOwnerUint)
-	} else {
-		return errors.New("int conversion would lead to loss of data! this is bad!")
-	}
+	uid := os.Getuid()
+	gid := os.Getgid()
 
 	// Restore the original owner to the new file
-	fmt.Println("chowning ", filePath, "to ", originalOwner)
-	if err := os.Chown(filePath, originalOwner, originalOwner); err != nil {
+	fmt.Println("chowning ", filePath, "to ", uid, " gid ", gid)
+	if err := os.Chown(filePath, uid, gid); err != nil {
 		fmt.Println("bad chown")
 		return err
+
+		//next we chmod
+	} else if err := os.Chmod(filePath, os.FileMode(0664)); err != nil {
+		fmt.Println(("bad chmod "))
 	}
 
 	return nil
 }
-
-//TEST
