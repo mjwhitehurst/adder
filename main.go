@@ -28,6 +28,9 @@ func main() {
 	runModeServer := false
 	action := -1
 
+	filePath := ""
+	newDbFieldAddition := DbFieldAddition{}
+
 	// Check the number of command-line arguments
 	if len(os.Args) < 2 {
 		runModeServer = true
@@ -46,6 +49,15 @@ func main() {
 			return
 		}
 
+		// we are running as a command line action - look for our file from arguments.
+		newDbFieldAddition.filePath = findFilePathCmdLine()
+		err := validateCmdLineArgs(&newDbFieldAddition)
+
+		if err != nil || filePath == "" {
+			printHelp()
+			return
+		}
+
 	} else { // we are running as a server
 		//TODO: get the action with other data from a http request
 		action = actionAddRecField
@@ -54,13 +66,22 @@ func main() {
 
 	switch action {
 	case actionAddRecField:
-		addRecField()
+		addRecField(newDbFieldAddition.filePath,
+			newDbFieldAddition.fieldName,
+			newDbFieldAddition.fieldType,
+			newDbFieldAddition.comment)
 		break
 	case actionAddMemField:
-		addMemField()
+		addMemField(newDbFieldAddition.filePath,
+			newDbFieldAddition.fieldName,
+			newDbFieldAddition.fieldType,
+			newDbFieldAddition.comment)
 		break
 	case actionAddNonDbField:
-		addNonDbField()
+		addNonDbField(newDbFieldAddition.filePath,
+			newDbFieldAddition.fieldName,
+			newDbFieldAddition.fieldType,
+			newDbFieldAddition.comment)
 		break
 	default:
 		break
@@ -135,75 +156,34 @@ func actionFromString(arg string) int {
 /**
  *
  */
-func addDatabaseField(tag string, nonDb bool) {
-
-	if len(os.Args) < 4 {
-		fmt.Println("Invalid number of arguments - use --help to find out more")
-		return
-	}
-
-	//PASSED IN BY DOCKER USING -v ARGUMENT
-	sourceDir := "/app/sourcedir"
-
-	stringArg1 := os.Args[2]
-	stringArg2 := os.Args[3]
-	stringArg3 := os.Args[4]
-	stringArg4 := ""
-
-	//have we got a comment?
-	if len(os.Args) == 6 {
-		stringArg4 = os.Args[5]
-	}
-
-	//check definitions file
-	definitionsFile := findDbDefinitionsFileInDir(stringArg1, sourceDir)
-
-	if definitionsFile == "" {
-		fmt.Println("Couldn't find definitions file from ", stringArg1)
-	} else {
-		fmt.Println("Found file ", definitionsFile, "from ", stringArg1)
-	}
-
-	//check arg 2 - field name
-	fieldName := validateFieldName(stringArg2)
-	if fieldName == "" {
-
-	}
-
-	//check arg 3 - type
-	fieldType := validateFieldType(stringArg3)
-	if fieldType == "" {
-
-	}
-
-	//check arg 4, if necessary
-	commentStr := ""
-	if stringArg4 != "" {
-		commentStr = validateComment(stringArg4)
-	}
-
-	fmt.Println("file: ", definitionsFile, " field name: ", fieldName, " field type: ", fieldType, " comment: ", commentStr)
+func addDatabaseField(
+	filePath string,
+	tag string,
+	fieldName string,
+	fieldType string,
+	commentStr string,
+	nonDb bool) {
 
 	//At this point we have a file, and we know what we want to put into it.
-	err := addFieldAfterTag(definitionsFile, nonDb, tag, fieldName, fieldType, commentStr)
+	err := addFieldBeforeTag(filePath, nonDb, tag, fieldName, fieldType, commentStr)
 	if err != nil {
 		fmt.Println("Error adding field: ", err)
 	}
 
 } /* addDatabaseField */
 
-func addRecField() {
-	addDatabaseField("ADDER REC START", false)
+func addRecField(filePath string, fieldName string, fieldType string, commentStr string) {
+	addDatabaseField(filePath, "ADDER REC END", fieldName, fieldType, commentStr, false)
 }
 
-func addMemField() {
-	addDatabaseField("ADDER MEM START", false)
+func addMemField(filePath string, fieldName string, fieldType string, commentStr string) {
+	addDatabaseField(filePath, "ADDER MEM END", fieldName, fieldType, commentStr, false)
 	return
 }
 
-func addNonDbField() {
+func addNonDbField(filePath string, fieldName string, fieldType string, commentStr string) {
 	//TODO: like addDatabaseField, but add the whole thing as a comment
-	addDatabaseField("ADDER NONDB START", true)
+	addDatabaseField(filePath, "ADDER NONDB END", fieldName, fieldType, commentStr, true)
 	return
 }
 
@@ -233,15 +213,8 @@ func validateFieldName(fieldName string) string {
 }
 
 /**
- *  Looks for a db file in a directory. will try multiple ways
- *  input:
- *          DB_NAME/db_name/db_name_definitions/db_name_definitions.h
- *
- *  looks for (and returns):
- *          db_name_definitions.h
- *
- *  on fail, returns ""
- *
+ * Tries to find a matching xxx_definitions.h from a string, in a directory given also
+ * by a string. returns filePath if ok, nil/"" if not
  */
 func findDbDefinitionsFileInDir(dbName string, dirName string) string {
 
@@ -250,23 +223,7 @@ func findDbDefinitionsFileInDir(dbName string, dirName string) string {
 		return ""
 	}
 
-	dbFileName := ""
-
-	// Best case scenario, we are given db_name_definitions.h
-	if strings.HasSuffix(dbName, "_definitions.h") {
-		//hooray
-		dbFileName = strings.TrimSuffix(dbName, "_definitions.h")
-
-	} else if strings.HasSuffix(dbName, "_definitions") {
-		//hooray
-		dbFileName = strings.TrimSuffix(dbName, "_definitions")
-
-	} else {
-		//guess! lower case it.
-		dbFileName = strings.ToLower(dbName)
-	}
-
-	definitionsFile := dbFileName + "_definitions.h"
+	definitionsFile := definitionsFileNameFromStr(dbName)
 
 	filePath := filepath.Join(dirName, definitionsFile)
 	fmt.Println("Searching for file: ", filePath)
@@ -278,7 +235,50 @@ func findDbDefinitionsFileInDir(dbName string, dirName string) string {
 	}
 } /* findDbDefinitionsFileInDir */
 
-func addFieldAfterTag(
+/**
+ *  Generates a filename from a given string, hoping we have enough information.
+ *          DB_NAME/db_name/db_name_definitions/db_name_definitions.h
+ *
+ *  looks for (and returns):
+ *          db_name_definitions.h
+ *
+ *  on fail, returns ""
+ *
+ */
+func definitionsFileNameFromStr(searchStr string) string {
+
+	//Null Check
+	if searchStr == "" {
+		return ""
+	}
+
+	dbFileName := ""
+
+	// Best case scenario, we are given db_name_definitions.h
+	if strings.HasSuffix(searchStr, "_definitions.h") {
+		//hooray
+		dbFileName = strings.TrimSuffix(searchStr, "_definitions.h")
+
+	} else if strings.HasSuffix(searchStr, "_definitions") {
+		//hooray
+		dbFileName = strings.TrimSuffix(searchStr, "_definitions")
+
+	} else {
+		//guess! lower case it.
+		dbFileName = strings.ToLower(searchStr)
+	}
+
+	definitionsFile := dbFileName + "_definitions.h"
+
+	//Give up
+	return definitionsFile
+}
+
+/**
+ *	opens a file, looks for a tag, and places a string above it.
+ *
+ */
+func addFieldBeforeTag(
 	filePath string,
 	nonDb bool,
 	tag string,
@@ -304,24 +304,30 @@ func addFieldAfterTag(
 	scanner := bufio.NewScanner(file)
 	writer := bufio.NewWriter(tempFile)
 
-	// Search for the tag and insert the new line after it
+	// Search for the tag and insert the new line before it
 	foundTag := false
 	for scanner.Scan() {
 		line := scanner.Text()
-		writer.WriteString(line + "\n")
 
 		if !foundTag && strings.Contains(line, tag) {
 			foundTag = true
 
-			// Insert the new line with field details after the tag
+			// Insert the new line with field details before the tag
 			newLine := ""
 			if nonDb {
-				newLine = fmt.Sprintf("  /* DEFNONDBFIELD %s %s; */ // %s\n", fieldType, fieldName, commentStr)
+				newLine = fmt.Sprintf("  /* DEFNONDBFIELD %s %s; */ // %s", fieldType, fieldName, commentStr)
 			} else {
-				newLine = fmt.Sprintf("  %s %s // %s\n", fieldType, fieldName, commentStr)
+				newLine = fmt.Sprintf("  %s %s // %s", fieldType, fieldName, commentStr)
 			}
+
+			// Write the new line with field details
 			writer.WriteString(newLine)
+			writer.WriteString("\n")
 		}
+
+		// Write the current line
+		writer.WriteString(line)
+		writer.WriteString("\n")
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -329,7 +335,7 @@ func addFieldAfterTag(
 	}
 
 	if !foundTag {
-		return errors.New("UNABLE TO FIND TAG IN FILE")
+		return errors.New("unable to find tag in file")
 	}
 
 	if err := writer.Flush(); err != nil {
@@ -356,15 +362,53 @@ func addFieldAfterTag(
 	gid := os.Getgid()
 
 	// Restore the original owner to the new file
-	fmt.Println("chowning ", filePath, "to ", uid, " gid ", gid)
+	fmt.Println("Chowning", filePath, "to UID:", uid, "GID:", gid)
 	if err := os.Chown(filePath, uid, gid); err != nil {
-		fmt.Println("bad chown")
 		return err
+	}
 
-		//next we chmod
-	} else if err := os.Chmod(filePath, os.FileMode(0664)); err != nil {
-		fmt.Println(("bad chmod "))
+	// Set the file permissions to -rw-rw-r--
+	if err := os.Chmod(filePath, os.FileMode(0664)); err != nil {
+		return err
 	}
 
 	return nil
-} /* findDbDefinitionsFileInDir */
+}
+
+func checkStringsInFile(filePath string, str1 string, str2 string) error {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	foundStr1 := false
+	foundStr2 := false
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.Contains(line, str1) {
+			foundStr1 = true
+		}
+		if strings.Contains(line, str2) {
+			foundStr2 = true
+		}
+
+		// Exit the loop early if both strings are found
+		if foundStr1 && foundStr2 {
+			break
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+
+	// Check if both strings are found in the file
+	if foundStr1 && foundStr2 {
+		return nil // Both strings are present
+	}
+
+	return errors.New("strings not found in file")
+}
