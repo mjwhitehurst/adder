@@ -146,6 +146,9 @@ func addFieldBeforeTag(
 
 	// Create a temporary file
 	tempFilePath := filePath + ".addertmp"
+
+	fmt.Println(" file: [", tempFilePath, "]")
+
 	tempFile, err := os.Create(tempFilePath)
 	if err != nil {
 		return err

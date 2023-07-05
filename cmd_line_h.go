@@ -2,13 +2,8 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"os"
 )
-
-/*#######################################################*/
-/* Variables / Declarations                              */
-/*#######################################################*/
 
 /*#######################################################*/
 /* Functions                                             */
@@ -17,6 +12,8 @@ import (
 func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
 	returnStruct := DbFieldAddition{}
 	action := -1
+	var err error
+
 	// Access the command-line argument
 	firstArg := os.Args[1]
 
@@ -24,41 +21,45 @@ func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
 	action = actionFromString(firstArg)
 
 	if action == -1 {
-		printHelp()
 		return returnStruct, errors.New("unable to determine action from argument!")
 	}
 
 	// we are running as a command line action - look for our file from arguments.
-	returnStruct.filePath = findFilePathCmdLine()
-	err := validateCmdLineArgs(&returnStruct)
+	returnStruct.filePath, err = findFilePathCmdLine()
+	if err != nil {
+		return returnStruct, err
+	}
+
+	err = validateCmdLineArgs(&returnStruct)
+	if err != nil {
+		return returnStruct, err
+	}
 
 	if err != nil || returnStruct.filePath == "" {
-		printHelp()
 		return returnStruct, errors.New("unable to build db addition struct from command line!")
 	}
 
 	return returnStruct, nil
-}
+} /* dbFieldAdditionFromCmdLine */
 
 /**
  *  Find a definitions file from a command line argument.
  */
-func findFilePathCmdLine() string {
+func findFilePathCmdLine() (string, error) {
 
 	//PASSED IN BY DOCKER USING -v ARGUMENT
 	sourceDir := "/app/sourcedir"
 	stringArg1 := os.Args[2]
+	var err error
 
 	//check definitions file
 	definitionsFile := findDbDefinitionsFileInDir(stringArg1, sourceDir)
 
 	if definitionsFile == "" {
-		fmt.Println("Couldn't find definitions file from ", stringArg1)
-	} else {
-		fmt.Println("Found file ", definitionsFile, "from ", stringArg1)
+		err = errors.New("Couldn't find definitions file from arg 2")
 	}
 
-	return definitionsFile
+	return definitionsFile, err
 } /* findFilePathCmdLine */
 
 /**
@@ -100,8 +101,6 @@ func validateCmdLineArgs(dataStruct *DbFieldAddition) error {
 	}
 
 	//Success
-	fmt.Println("field name: ", fieldName, " field type: ", fieldType, " comment: ", commentStr)
-
 	dataStruct.fieldName = fieldName
 	dataStruct.fieldType = fieldType
 	dataStruct.comment = commentStr

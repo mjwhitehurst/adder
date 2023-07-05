@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 // Define all the actions here
 // adding one here requires adding  handling later
 const (
@@ -8,6 +10,13 @@ const (
 	actionAddMemField    = 2
 	actionAddNonDbField  = 3
 	actionChainDatabases = 4
+)
+
+const (
+	printModeNone   = -1
+	printModeScreen = 0
+	printModeLog    = 1
+	noOfPrintModes
 )
 
 /**
@@ -28,3 +37,22 @@ func actionFromString(arg string) int {
 		return -1 //default
 	}
 }
+
+/**
+ * TODO: make this log somewhere for when used as a server
+ */
+func printOrLog(printMode int, msg ...interface{}) {
+
+	switch printMode {
+	case printModeNone:
+		return
+	case printModeScreen:
+		fmt.Println(msg...)
+		return
+	case printModeLog:
+		return
+
+	default:
+		return
+	}
+} /* printOrLog */
