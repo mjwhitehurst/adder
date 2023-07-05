@@ -14,6 +14,32 @@ import (
 /* Functions                                             */
 /*#######################################################*/
 
+func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
+	returnStruct := DbFieldAddition{}
+	action := -1
+	// Access the command-line argument
+	firstArg := os.Args[1]
+
+	// Process the argument and display the result
+	action = actionFromString(firstArg)
+
+	if action == -1 {
+		printHelp()
+		return returnStruct, errors.New("unable to determine action from argument!")
+	}
+
+	// we are running as a command line action - look for our file from arguments.
+	returnStruct.filePath = findFilePathCmdLine()
+	err := validateCmdLineArgs(&returnStruct)
+
+	if err != nil || returnStruct.filePath == "" {
+		printHelp()
+		return returnStruct, errors.New("unable to build db addition struct from command line!")
+	}
+
+	return returnStruct, nil
+}
+
 /**
  *  Find a definitions file from a command line argument.
  */
@@ -82,3 +108,28 @@ func validateCmdLineArgs(dataStruct *DbFieldAddition) error {
 
 	return nil
 } /* validateCmdLineArgs */
+
+/**
+ *  TODO: validation on comments
+ */
+func validateComment(comment string) string {
+	return comment
+}
+
+/**
+ *  TODO: validation on field type?
+ */
+func validateFieldType(fieldType string) string {
+	return fieldType
+
+	//TODO: generate a list here of all types in the matflo system... how?
+	// in the meantime, just allow anything.. it's just text, after all
+}
+
+/**
+ *  TODO: validation on field names? make them consistent?
+ *
+ */
+func validateFieldName(fieldName string) string {
+	return fieldName
+}
