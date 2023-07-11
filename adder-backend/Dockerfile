@@ -1,10 +1,5 @@
 # Start from a minimal Alpine Linux image
-FROM golang:1.16-alpine
-
-#Any environment variables?
-#debug
-ENV GODEBUG=gctrace=1
-
+FROM golang:1.16-alpine AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -24,5 +19,5 @@ RUN go build -o adder
 # Set the entry point for the container
 ENTRYPOINT ["./adder" ]
 
-#default thing to do is display help
-CMD [ "--help" ]
+# Default? helptext.
+CMD ["--help"]
