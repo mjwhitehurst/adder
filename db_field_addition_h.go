@@ -123,7 +123,6 @@ func findDbDefinitionsFileInDir(dbName string, dirName string) string {
 	definitionsFile := definitionsFileNameFromStr(dbName)
 
 	filePath := filepath.Join(dirName, definitionsFile)
-	fmt.Println("Searching for file: ", filePath)
 
 	if _, err := os.Stat(filePath); err == nil {
 		return filePath
@@ -146,8 +145,6 @@ func addFieldBeforeTag(
 
 	// Create a temporary file
 	tempFilePath := filePath + ".addertmp"
-
-	fmt.Println(" file: [", tempFilePath, "]")
 
 	tempFile, err := os.Create(tempFilePath)
 	if err != nil {
@@ -223,7 +220,6 @@ func addFieldBeforeTag(
 	gid := os.Getgid()
 
 	// Restore the original owner to the new file
-	fmt.Println("Chowning", filePath, "to UID:", uid, "GID:", gid)
 	if err := os.Chown(filePath, uid, gid); err != nil {
 		return err
 	}

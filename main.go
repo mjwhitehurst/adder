@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 )
@@ -39,14 +40,38 @@ func main() {
 
 	/* If we're command-line run, then work out what we're doing. */
 	if runMode == runModeCmdLine {
-		newDbFieldAddition, err = dbFieldAdditionFromCmdLine()
 
-		if err != nil {
-			printOrLog(printMode, "ERROR: ", err.Error())
+		//determine what we're doing
+		firstArg := os.Args[1]
+
+		// Process the argument and display the result
+		action = actionFromString(firstArg)
+
+		//pre-emptively set error.
+		err = errors.New("Error using action to get data")
+
+		switch action {
+		/* Field additions are all handled by the same functions */
+		case actionAddRecField:
+			fallthrough
+		case actionAddMemField:
+			fallthrough
+		case actionAddNonDbField:
+			newDbFieldAddition, err = dbFieldAdditionFromCmdLine()
+			break
+
+		//TODO: add more actions here if necessary
+
+		case -1:
+		default:
 			printHelp(printMode)
 			return
 		}
-		printOrLog(printMode, "got field addition from command line")
+
+		if err != nil {
+			printOrLog(printMode, "ERROR: ", err.Error())
+			return
+		}
 
 	} else if runMode == runModeServer { // we are running as a server
 		// TODO: get the action with other data from an HTTP request
@@ -90,8 +115,11 @@ func main() {
 			newDbFieldAddition.comment)
 		break
 	default:
+		printOrLog(printMode, "not given an action - exiting")
 		break
 	}
+
+	printOrLog(printMode, "-- Finished Process -- ")
 } /* main */
 
 /*#######################################################*/

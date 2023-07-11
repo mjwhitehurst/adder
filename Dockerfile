@@ -1,6 +1,11 @@
 # Start from a minimal Alpine Linux image
 FROM golang:1.16-alpine
 
+#Any environment variables?
+#debug
+ENV GODEBUG=gctrace=1
+
+
 # Set the working directory inside the container
 WORKDIR /app
 

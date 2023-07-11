@@ -47,7 +47,8 @@ func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
  */
 func findFilePathCmdLine() (string, error) {
 
-	//PASSED IN BY DOCKER USING -v ARGUMENT
+	//ACTUAL $SRC PASSED IN BY DOCKER USING -v ARGUMENT
+	//Defined by using "-v $SRC:/app/sourcedir"
 	sourceDir := "/app/sourcedir"
 	stringArg1 := os.Args[2]
 	var err error
@@ -67,7 +68,6 @@ func findFilePathCmdLine() (string, error) {
  *		functions.
  */
 func validateCmdLineArgs(dataStruct *DbFieldAddition) error {
-
 	if len(os.Args) < 4 {
 		return errors.New("Invalid number of arguments - use --help to find out more")
 	}
