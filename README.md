@@ -28,9 +28,17 @@ docker run hello-world
 
 build:
 
+move to adder-backend directory
 touch go.sum
-sudo docker build -t adder .
+docker build -t adder-backend .
+
+move to adder-frontend directory
+
+
 
 run:
 docker run --user "$(id -u)":"$(id -u)" -v $SRC:/app/sourcedir adder ADD_REC_FIELD TM Flag1 BOOLEAN hi
+
+
+
 
