@@ -6,19 +6,32 @@
 </head>
 
 <body>
-  <h2>Test Response</h2>
-  <pre><%= JSON.stringify(response, null, 2) %></pre>
-
   <h2>Routes</h2>
   <ul>
     <% for(let route of routes) { %>
       <li>
-        <a href="<%= route.path %>">
-          <%= route.method %> - <%= route.path %>
-        </a>
+        <%= route.method %>
+          <%= route.path %>
+            <% if (route.method==='GET' ) { %>
+              <button class="api-button" data-route="<%= route.path %>">Test</button>
+              <% } %>
       </li>
       <% } %>
   </ul>
+
+  <h2>API Response</h2>
+  <pre id="apiResponse"></pre>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script>
+    $('.api-button').click(function () {
+      let route = $(this).data('route');
+      $.get(`/proxy${route}`, function (data, status) {
+        console.log('Data: ' + data + '\nStatus: ' + status);
+        $('#apiResponse').text(JSON.stringify(data, null, 2));
+      });
+    });
+  </script>
 </body>
 
 </html>
