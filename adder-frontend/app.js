@@ -12,6 +12,25 @@ app.get('/', (req, res) => {
   res.render('index', { response: '', server: '', method: 'GET', body: '' });
 });
 
+
+app.get('/second', async (req, res) => {
+  let server = req.query.server || 'host.docker.internal';
+
+  if (!server.startsWith('http://') && !server.startsWith('https://')) {
+      server = 'http://' + server;
+  }
+
+  try {
+      const response = await axios.get(`${server}:8080`);
+      const routesResponse = await axios.get(`${server}:8080/routes`);
+      console.log(routesResponse.data);
+      res.render('second', { response: JSON.stringify(response.data, null, 2), routes: routesResponse.data });
+  } catch (error) {
+      res.render('error', { error: error.toString() });
+  }
+});
+
+
 app.post('/makeRequest', async (req, res) => {
     let { server, method, body } = req.body;
     let response;

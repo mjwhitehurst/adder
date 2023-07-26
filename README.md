@@ -45,6 +45,8 @@ docker run --user "$(id -u)":"$(id -u)" -p 8080:8080 -v $SRC:/app/sourcedir adde
 curls (server):
 curl -X POST http://localhost:8080/add-db-field -H 'Content-Type: application/json' -d '{"database_name":"tm", "field_name":"MyBool", "field_type":"int", "comment":"TESTCOMMENT", "option":"NONDB"}'
 
+run frontend:
+docker run -p 8500:3000 --add-host=host.docker.internal:host-gateway adder-frontend
 
 
 

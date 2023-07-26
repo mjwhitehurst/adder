@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Second Page</title>
+</head>
+
+<body>
+  <h2>Response</h2>
+  <pre><%= response %></pre>
+  <h2>Routes</h2>
+  <ul>
+    <% for(let route of routes) { %>
+      <li>
+        <%= route.method %> - <%= route.path %>
+      </li>
+      <% } %>
+  </ul>
+</body>
+
+</html>

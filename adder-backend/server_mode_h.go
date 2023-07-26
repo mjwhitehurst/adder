@@ -22,6 +22,12 @@ func runServer() {
 	r := gin.Default()
 	const srcDir = "/app/sourcedir"
 
+	r.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "Server running!",
+		})
+	})
+
 	//GET request - just a quick ping
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
