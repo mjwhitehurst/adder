@@ -1,59 +1,54 @@
 const express = require('express');
 const axios = require('axios');
+const bodyParser = require('body-parser');
+const { addHttp } = require('./util');
 const app = express();
 const port = 3000;
 
-// Here we are configuring express to use body-parser as middle-ware and set up EJS.
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+let defaultServer = process.env.HOST_ADDRESS || "localhost"; // renamed to defaultServer
+
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.render('index', { response: '', server: '', method: 'GET', body: '' });
+  res.render('index', { server: '', method: '', path: '', body: '', response: '' });
 });
 
-
-app.get('/second', async (req, res) => {
-  let server = req.query.server || 'host.docker.internal';
-
-  if (!server.startsWith('http://') && !server.startsWith('https://')) {
-      server = 'http://' + server;
-  }
+app.post('/', async (req, res) => {
+  let { server, method, path, body } = req.body;
+  server = addHttp(server || defaultServer);
 
   try {
-      const response = await axios.get(`${server}:8080`);
-      const routesResponse = await axios.get(`${server}:8080/routes`);
-      console.log(routesResponse.data);
-      res.render('second', { response: JSON.stringify(response.data, null, 2), routes: routesResponse.data });
+    let response = await axios({ method, url: server + path, data: body });
+    console.log(response.data);  // Log the response data
+    res.render('index', { server, method, path, body, response: JSON.stringify(response.data, null, 2) });
   } catch (error) {
-      res.render('error', { error: error.toString() });
+    res.render('index', { server, method, path, body, response: JSON.stringify({ message: error.message, stack: error.stack }, null, 2) });
   }
 });
 
+app.get('/second', async (req, res) => {
+  let server = process.env.HOST_ADDRESS || "localhost";
+  try {
+    let testResponse = await axios.get(addHttp(server + ':8080'));
+    console.log("Test response: ", testResponse);
 
-app.post('/makeRequest', async (req, res) => {
-    let { server, method, body } = req.body;
-    let response;
     try {
-        // Check if the server URL starts with http:// or https://, and if not, prepend with "http://"
-        if (!server.startsWith('http://') && !server.startsWith('https://')) {
-            server = 'http://' + server;
-        }
-
-        if (method === 'GET') {
-            response = await axios.get(server);
-        } else if (method === 'POST') {
-            // Assuming the body is in JSON format, you might need to handle parsing the JSON safely.
-            response = await axios.post(server, JSON.parse(body));
-        }
-        // Add more methods as needed
-        response = response.data;
+      let response = await axios.get(addHttp(server + ':8080/routes'));
+      let routes = response.data.routes;
+      res.render('second', { response: testResponse.data, routes });
     } catch (error) {
-        response = error.toString();
+      console.log("Error getting routes: ", error);
+      res.render('error', { error: JSON.stringify(error, null, 2) });
     }
-    res.render('index', { response: JSON.stringify(response, null, 2), server, method, body });
+  } catch (error) {
+    console.log("Error making test request: ", error);
+    res.render('error', { error: JSON.stringify(error, null, 2) });
+  }
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
+  console.log(`App listening on port ${port}!`);
 });
+
+module.exports = app;

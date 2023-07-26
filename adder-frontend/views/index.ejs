@@ -1,30 +1,27 @@
-<head>
-  <title>Simple Frontend</title>
-</head>
-
-<body>
-  <form action="/makeRequest" method="POST">
-    <div>
-      <label for="server">Server:</label>
-      <input type="text" id="server" name="server" value="<%= server %>">
-    </div>
-    <div>
-      <label for="method">Method:</label>
-      <select id="method" name="method">
-        <option value="GET" <%=method==='GET' ? 'selected' : '' %>>GET</option>
-        <option value="POST" <%=method==='POST' ? 'selected' : '' %>>POST</option>
-        <!-- Add more methods as needed -->
-      </select>
-    </div>
-    <div>
-      <label for="body">Body:</label>
-      <textarea id="body" name="body" rows="4" cols="50"><%= body %></textarea>
-    </div>
-    <input type="submit" value="Make Request">
-  </form>
-
-  <h2>Response</h2>
-  <pre><%= response %></pre>
-</body>
-
-</html>
+<form action="/" method="POST">
+  <div>
+    <label for="server">Server:</label>
+    <input type="text" id="server" name="server" value="<%= server %>">
+  </div>
+  <div>
+    <label for="method">Method:</label>
+    <select id="method" name="method">
+      <option value="GET" <%=method==='GET' ? 'selected' : '' %>>GET</option>
+      <option value="POST" <%=method==='POST' ? 'selected' : '' %>>POST</option>
+      <!-- Add more methods as needed -->
+    </select>
+  </div>
+  <div>
+    <label for="path">Path:</label>
+    <input type="text" id="path" name="path" value="<%= path %>">
+  </div>
+  <div>
+    <label for="body">Body:</label>
+    <textarea id="body" name="body" rows="4" cols="50"><%= body %></textarea>
+  </div>
+  <input type="submit" value="Make Request">
+  <div>
+    <h2>Response:</h2>
+    <pre><%= response %></pre>
+  </div>
+</form>

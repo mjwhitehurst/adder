@@ -6,13 +6,16 @@
 </head>
 
 <body>
-  <h2>Response</h2>
-  <pre><%= response %></pre>
+  <h2>Test Response</h2>
+  <pre><%= JSON.stringify(response, null, 2) %></pre>
+
   <h2>Routes</h2>
   <ul>
     <% for(let route of routes) { %>
       <li>
-        <%= route.method %> - <%= route.path %>
+        <a href="<%= route.path %>">
+          <%= route.method %> - <%= route.path %>
+        </a>
       </li>
       <% } %>
   </ul>
