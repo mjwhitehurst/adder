@@ -103,6 +103,24 @@ func runServer() {
 		})
 	})
 
+	r.GET("/dblist", func(c *gin.Context) {
+		definitions, status := findDefinitionFiles()
+		c.String(status, definitions)
+	})
+
+	/* LAST ONE: ALL ROUTES */
+	r.GET("/routes", func(c *gin.Context) {
+		routes := r.Routes()
+		var routesInfo []string
+		for _, route := range routes {
+			routesInfo = append(routesInfo, fmt.Sprintf("%s, %s", route.Method, route.Path))
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"routes": routesInfo,
+		})
+	})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080" // Default port if not specified

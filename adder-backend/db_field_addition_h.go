@@ -2,8 +2,11 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -268,4 +271,35 @@ func checkStringsInFile(filePath string, str1 string, str2 string) error {
 	}
 
 	return errors.New("strings not found in file")
+}
+
+/**
+ *	Returns a list of all the definitions files a system has
+ */
+func findDefinitionFiles() (string, int) {
+	srcDir := "/app/sourcedir"
+	files, err := ioutil.ReadDir(srcDir)
+	if err != nil {
+		return err.Error(), http.StatusInternalServerError
+	}
+
+	var definitionFiles []string
+	for _, file := range files {
+		filename := file.Name()
+		if strings.HasSuffix(filename, "_definitions.h") {
+			definitionName := strings.TrimSuffix(filename, "_definitions.h")
+			definitionFiles = append(definitionFiles, definitionName)
+		}
+	}
+
+	if len(definitionFiles) == 0 {
+		return "No definition files found", http.StatusNotFound
+	}
+
+	jsonOutput, err := json.Marshal(definitionFiles)
+	if err != nil {
+		return err.Error(), http.StatusInternalServerError
+	}
+
+	return string(jsonOutput), http.StatusOK
 }
