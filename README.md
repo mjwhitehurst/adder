@@ -36,8 +36,12 @@ move to adder-frontend directory
 
 
 
-run:
-docker run --user "$(id -u)":"$(id -u)" -v $SRC:/app/sourcedir adder ADD_REC_FIELD TM Flag1 BOOLEAN hi
+run (cmd line):
+docker run --user "$(id -u)":"$(id -u)" -v $SRC:/app/sourcedir adder-backend ADD_REC_FIELD TM Flag1 BOOLEAN hi
+
+run (server):
+docker run --user "$(id -u)":"$(id -u)" -p 8080:8080 -v $SRC:/app/sourcedir adder-backend
+
 
 
 
