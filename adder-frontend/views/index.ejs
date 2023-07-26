@@ -1,28 +1,26 @@
-<!DOCTYPE html>
-<html>
-
 <head>
-  <title>HTTP Request Maker</title>
+  <title>Simple Frontend</title>
 </head>
 
 <body>
-  <h1>HTTP Request Maker</h1>
-
   <form action="/makeRequest" method="POST">
-    <label for="server">Server:</label><br>
-    <input type="text" id="server" name="server"><br>
-
-    <label for="method">Method:</label><br>
-    <select name="method" id="method">
-      <option value="GET">GET</option>
-      <option value="POST">POST</option>
-      <!-- Add more methods as needed -->
-    </select><br>
-
-    <label for="body">Body:</label><br>
-    <textarea id="body" name="body"></textarea><br>
-
-    <input type="submit" value="Submit">
+    <div>
+      <label for="server">Server:</label>
+      <input type="text" id="server" name="server" value="<%= server %>">
+    </div>
+    <div>
+      <label for="method">Method:</label>
+      <select id="method" name="method">
+        <option value="GET" <%=method==='GET' ? 'selected' : '' %>>GET</option>
+        <option value="POST" <%=method==='POST' ? 'selected' : '' %>>POST</option>
+        <!-- Add more methods as needed -->
+      </select>
+    </div>
+    <div>
+      <label for="body">Body:</label>
+      <textarea id="body" name="body" rows="4" cols="50"><%= body %></textarea>
+    </div>
+    <input type="submit" value="Make Request">
   </form>
 
   <h2>Response</h2>

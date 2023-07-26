@@ -9,7 +9,7 @@ app.use(express.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-  res.render('index', { response: '' });
+  res.render('index', { response: '', server: '', method: 'GET', body: '' });
 });
 
 app.post('/makeRequest', async (req, res) => {
@@ -32,7 +32,7 @@ app.post('/makeRequest', async (req, res) => {
     } catch (error) {
         response = error.toString();
     }
-    res.render('index', { response: JSON.stringify(response, null, 2) });
+    res.render('index', { response: JSON.stringify(response, null, 2), server, method, body });
 });
 
 app.listen(port, () => {
