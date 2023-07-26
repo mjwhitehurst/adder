@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-
-	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -80,24 +78,7 @@ func main() {
 	} else if runMode == runModeServer { // we are running as a server
 		// TODO: get the action with other data from an HTTP request
 
-		r := gin.Default()
-
-		r.GET("/ping", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"message": "pong",
-			})
-		})
-
-		port := os.Getenv("PORT")
-		if port == "" {
-			port = "8080" // Default port if not specified
-		}
-
-		r.Run(":" + port) // listen and serve on the specified port
-
-		action = actionAddRecField
-
-		/* BLOCK HERE TO CHECK SERVER*/
+		runServer()
 
 	} else { //I HAVE NO IDEA WHAT IM DOING, JUST PRINT HELP!
 		printHelp(printMode)
