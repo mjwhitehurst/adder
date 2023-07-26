@@ -117,9 +117,13 @@ func runServer() {
 	/* LAST ONE: ALL ROUTES */
 	r.GET("/routes", func(c *gin.Context) {
 		routes := r.Routes()
-		var routesInfo []string
+		var routesInfo []map[string]string
 		for _, route := range routes {
-			routesInfo = append(routesInfo, fmt.Sprintf("%s, %s", route.Method, route.Path))
+			routeInfo := map[string]string{
+				"method": route.Method,
+				"path":   route.Path,
+			}
+			routesInfo = append(routesInfo, routeInfo)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
