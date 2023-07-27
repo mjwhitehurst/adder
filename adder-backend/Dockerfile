@@ -1,6 +1,12 @@
 # Start from a minimal Alpine Linux image with Go installed
 FROM golang:1.16-alpine AS builder
 
+# Install gcc and musl-dev
+RUN apk add --no-cache gcc musl-dev
+
+# Install Delve
+RUN go get github.com/go-delve/delve/cmd/dlv
+
 # Set the working directory inside the container
 WORKDIR /app
 
@@ -13,12 +19,13 @@ RUN go mod download
 # Copy the rest of the application source code
 COPY . .
 
-# Build the Go application
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o adder-backend .
+# Build the Go application with debugging flags
+RUN go build -gcflags="all=-N -l" -o adder-backend .
 
 # Start a new stage from scratch
 FROM alpine:latest
 
+# Install ca-certificates
 RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
@@ -26,8 +33,8 @@ WORKDIR /root/
 # Copy the binary from builder stage
 COPY --from=builder /app/adder-backend .
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose ports 8080 (for application) and 2345 (for Delve)
+EXPOSE 8080 2345
 
-# Set the entry point for the container
-ENTRYPOINT ["./adder-backend"]
+# Set the entry point to Delve debugger
+ENTRYPOINT ["dlv", "exec", "/root/adder-backend", "--continue", "--accept-multiclient", "--api-version=2", "--headless", "--listen=:2345"]

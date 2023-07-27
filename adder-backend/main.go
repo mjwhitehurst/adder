@@ -33,7 +33,8 @@ func main() {
 		runMode = runModeServer
 		printOrLog(printMode, "run mode: Server")
 	} else {
-		runMode = runModeCmdLine
+		//forcing server for now
+		runMode = runModeServer
 		printOrLog(printMode, "run mode: Cmd Line")
 	}
 

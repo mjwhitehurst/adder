@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -39,7 +40,6 @@ func runServer() {
 
 	//Server Info - send back a bunch of info to display on the main page
 	r.GET("/server-info", func(c *gin.Context) {
-		const srcDir = "/app/sourcedir"
 		dirExists := false
 		definitionFilesCount := 0
 		files, err := ioutil.ReadDir(srcDir)
@@ -77,6 +77,22 @@ func runServer() {
 		c.JSON(http.StatusOK, gin.H{
 			"file_exists": exists,
 		})
+	})
+
+	r.GET("/fields/:dbname", func(c *gin.Context) {
+		dbname := c.Param("dbname")
+		filename := dbname + "_definitions.h"
+		filePath := filepath.Join(srcDir, filename)
+
+		memFields, err := findRecFields(filePath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("error parsing fields: %v", err),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, memFields)
 	})
 
 	r.POST("/add-db-field", func(c *gin.Context) {
