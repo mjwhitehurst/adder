@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 
 <head>
@@ -14,21 +15,19 @@
           <%= route.path %>
             <% if (route.method==='GET' ) { %>
               <button class="api-button" data-route="<%= route.path %>">Test</button>
+              <pre class="api-response"></pre>
               <% } %>
       </li>
       <% } %>
   </ul>
 
-  <h2>API Response</h2>
-  <pre id="apiResponse"></pre>
-
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
     $('.api-button').click(function () {
-      let route = $(this).data('route');
-      $.get(`/proxy${route}`, function (data, status) {
-        console.log('Data: ' + data + '\nStatus: ' + status);
-        $('#apiResponse').text(JSON.stringify(data, null, 2));
+      const button = $(this);
+      const route = button.data('route');
+      $.get(`http://mawhit1:8080${route}`, function (data, status) {
+        button.next('.api-response').text(JSON.stringify(data, null, 2));
       });
     });
   </script>
