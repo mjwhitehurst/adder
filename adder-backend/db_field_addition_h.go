@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -219,8 +220,20 @@ func addFieldBeforeTag(
 	}
 
 	// Get the original owner
-	uid := os.Getuid()
-	gid := os.Getgid()
+
+	uidStr := os.Getenv("HOST_UID")
+	gidStr := os.Getenv("HOST_GID")
+
+	// Convert UID and GID from string to int
+	uid, err := strconv.Atoi(uidStr)
+	if err != nil {
+		return err
+	}
+
+	gid, err := strconv.Atoi(gidStr)
+	if err != nil {
+		return err
+	}
 
 	// Restore the original owner to the new file
 	if err := os.Chown(filePath, uid, gid); err != nil {
