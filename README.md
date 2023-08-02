@@ -41,14 +41,13 @@ docker run --user "$(id -u)":"$(id -u)" -v $SRC:/app/sourcedir adder-backend ADD
 
 run (server):
 
-docker run                \
-    --cap-add=SYS_PTRACE  \
-    -e HOST_UID=$(id -u)  \
-    -e HOST_GID=$(id -g)  \
-    -p 8080:8080          \
-    -p 2345:2345          \
-    -v $SRC:/app/sourcedir\
-    adder-backend         \
+docker run                        \
+    --cap-add=SYS_PTRACE          \
+    --user "$(id -u)":"$(id -u)"  \
+    -p 8080:8080                  \
+    -p 2345:2345                  \
+    -v $SRC:/app/sourcedir        \
+    adder-backend                 \
     dlv debug --headless --listen=:2345 --api-version=2 --log
 
 curls (server):

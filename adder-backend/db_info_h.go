@@ -119,11 +119,10 @@ func findRecFields(filePath string) ([]Field, error) {
 
 	// Use a scanner to read the file line by line
 	scanner := bufio.NewScanner(file)
-
-	// Booleans to check which structure we're in.
+	// Flags to indicate where in the file we think we are. always expecting MEM struct to turn up before REC struct.
+	seenMemStruct := false
 	inMemStruct := false
 	inRecStruct := false
-	seenMemStruct := false
 
 	// ignoreStrings are lines we'll skip over when encountered
 	ignoreStrings := []string{"ifdef", "endif", "PLUGINSTART", "PLUGINEND", "DEFNONDBFIELD"}
@@ -155,24 +154,30 @@ func findRecFields(filePath string) ([]Field, error) {
 			line = strings.ReplaceAll(line, "/*pi*/", "")
 		}
 
-		// First time we see 'typedef struct', it'll be the mem.
-		if !inMemStruct && strings.HasPrefix(trimmedLine, "typedef struct") {
-			inMemStruct = true
-			seenMemStruct = true
+	  // We are expecting them to hit the mem struct first.
+		// If the line starts a struct definition, set the inStruct flag to true
+		if strings.HasPrefix(trimmedLine, "typedef struct") {
+			// We have found the mem!
+			if !seenMemStruct {
+				inMemStruct = true
+				seenMemStruct = true
+
+				// If we've already seen the mem, then we must be in the rec. unless something is drastically wrong.
+			} else if seenMemStruct && !inMemStruct {
+				inRecStruct = true
+			}
 			continue
-			// If the line is the end of the mem struct, flag that we're out of it.
+			//next, we can handle things. if we see } and _MEM_REC_TYPE, then we must be leaving the mem rec.
 		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_MEM_REC_TYPE;") {
 			inMemStruct = false
 			continue
-		} else if seenMemStruct && strings.HasPrefix(trimmedLine, "typedef struct") {
-			inRecStruct = true
-			continue
-			//end of processing hopefully.
-		} else if strings.HasPrefix(trimmedLine, "typedef struct") {
+
+			//if we see } and _REC_TYPE, but not MEM.. then we can assume we're leaving the REC struct, and can give up.
+		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_REC_TYPE;") && !strings.Contains(trimmedLine, "_MEM_" ) {
 			break
 		}
 
-		// If the current line is within a struct definition, try to parse it as a field definition
+		// If the current line is within the REC, try to parse it as a field definition
 		if inRecStruct {
 			// This regular expression matches lines of the form "Type Name; // Comment" or "Type Name; /* Comment */"
 			fieldPattern := regexp.MustCompile(`^\s*([\w\[\]]+)\s+([\w\[\]]+);\s*(?://\s*(.*)|\s*/\*\s*(.*)\s*\*/)?$`)
