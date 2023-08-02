@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -281,14 +280,12 @@ func findNondbFields(filePath string) ([]Field, error) {
 
 		// If the current line is within the REC, and it has nondb in it, try to parse it as a field definition
 		if inRecStruct {
-			fmt.Println(line)
 			fieldPattern := regexp.MustCompile(`/\*\s*DEFNONDBFLD\s+([\w\[\]]+)\s+([\w\[\]]+);\s*\*/\s*((//\s*(.*))|(/\*(.*)\*/))?$`)
 
 			matches := fieldPattern.FindStringSubmatch(line)
 
 			// If the line matches the regular expression, extract the field's type, name, and comment
 			if matches != nil {
-				fmt.Println("match")
 				var comment string
 				if matches[5] != "" {
 					comment = matches[5]
@@ -303,8 +300,6 @@ func findNondbFields(filePath string) ([]Field, error) {
 
 				// Add the parsed field to the list of fields
 				fields = append(fields, field)
-			} else {
-				fmt.Println("no match")
 			}
 		}
 	}

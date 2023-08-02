@@ -87,12 +87,32 @@ func runServer() {
 		memFields, err := findNondbFields(filePath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
-				"message": fmt.Sprintf("error parsing fields: %v", err),
+				"message": fmt.Sprintf("error parsing mem fields: %v", err),
 			})
 			return
 		}
 
-		c.JSON(http.StatusOK, memFields)
+		recFields, err := findRecFields(filePath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("error parsing rec fields: %v", err),
+			})
+			return
+		}
+
+		nondbFields, err := findNondbFields(filePath)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"message": fmt.Sprintf("error parsing nondb fields: %v", err),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"memFields":   memFields,
+			"recFields":   recFields,
+			"nondbFields": nondbFields,
+		})
 	})
 
 	r.POST("/add-db-field", func(c *gin.Context) {
