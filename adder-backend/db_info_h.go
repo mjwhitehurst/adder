@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
@@ -154,7 +155,7 @@ func findRecFields(filePath string) ([]Field, error) {
 			line = strings.ReplaceAll(line, "/*pi*/", "")
 		}
 
-	  // We are expecting them to hit the mem struct first.
+		// We are expecting them to hit the mem struct first.
 		// If the line starts a struct definition, set the inStruct flag to true
 		if strings.HasPrefix(trimmedLine, "typedef struct") {
 			// We have found the mem!
@@ -173,7 +174,7 @@ func findRecFields(filePath string) ([]Field, error) {
 			continue
 
 			//if we see } and _REC_TYPE, but not MEM.. then we can assume we're leaving the REC struct, and can give up.
-		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_REC_TYPE;") && !strings.Contains(trimmedLine, "_MEM_" ) {
+		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_REC_TYPE;") && !strings.Contains(trimmedLine, "_MEM_") {
 			break
 		}
 
@@ -197,6 +198,113 @@ func findRecFields(filePath string) ([]Field, error) {
 
 				// Add the parsed field to the list of fields
 				fields = append(fields, field)
+			}
+		}
+	}
+
+	// If an error occurred while reading the file, return the error
+	if scanner.Err() != nil {
+		return nil, scanner.Err()
+	}
+
+	// Return the list of fields
+	return fields, nil
+}
+
+func findNondbFields(filePath string) ([]Field, error) {
+	// Open the file for reading
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close() // Ensure the file is closed even if an error occurs
+
+	// Use a scanner to read the file line by line
+	scanner := bufio.NewScanner(file)
+	// Flags to indicate where in the file we think we are. always expecting MEM struct to turn up before REC struct.
+	seenMemStruct := false
+	inMemStruct := false
+	inRecStruct := false
+
+	// ignoreStrings are lines we'll skip over when encountered
+	ignoreStrings := []string{"ifdef", "endif", "PLUGINSTART", "PLUGINEND"}
+
+	// Fields will hold the struct fields we find
+	var fields []Field
+
+	// Read the file line by line
+	for scanner.Scan() {
+		line := scanner.Text()                 // Get the current line
+		trimmedLine := strings.TrimSpace(line) // Remove leading/trailing whitespace
+
+		// Check whether the line contains any of the strings we want to ignore
+		shouldIgnore := false
+		for _, ignore := range ignoreStrings {
+			if strings.Contains(trimmedLine, ignore) {
+				shouldIgnore = true
+				break
+			}
+		}
+
+		// If the line should be ignored, skip to the next line
+		if shouldIgnore {
+			continue
+		}
+
+		// Remove any /*pi*/ comments from the line
+		if strings.Contains(trimmedLine, "/*pi*/") {
+			line = strings.ReplaceAll(line, "/*pi*/", "")
+		}
+
+		// We are expecting them to hit the mem struct first.
+		// If the line starts a struct definition, set the inStruct flag to true
+		if strings.HasPrefix(trimmedLine, "typedef struct") {
+			// We have found the mem!
+			if !seenMemStruct {
+				inMemStruct = true
+				seenMemStruct = true
+
+				// If we've already seen the mem, then we must be in the rec. unless something is drastically wrong.
+			} else if seenMemStruct && !inMemStruct {
+				inRecStruct = true
+			}
+			continue
+			//next, we can handle things. if we see } and _MEM_REC_TYPE, then we must be leaving the mem rec.
+		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_MEM_REC_TYPE;") {
+			inMemStruct = false
+			continue
+
+			//if we see } and _REC_TYPE, but not MEM.. then we can assume we're leaving the REC struct, and can give up.
+		} else if strings.Contains(trimmedLine, "}") && strings.Contains(trimmedLine, "_REC_TYPE;") && !strings.Contains(trimmedLine, "_MEM_") {
+			break
+		}
+
+		// If the current line is within the REC, and it has nondb in it, try to parse it as a field definition
+		if inRecStruct {
+			fmt.Println(line)
+			fieldPattern := regexp.MustCompile(`/\*\s*DEFNONDBFLD\s+([\w\[\]]+)\s+([\w\[\]]+);\s*\*/\s*((//\s*(.*))|(/\*(.*)\*/))?$`)
+
+			matches := fieldPattern.FindStringSubmatch(line)
+
+			// If the line matches the regular expression, extract the field's type, name, and comment
+			if matches != nil {
+				fmt.Println("match")
+				var comment string
+				if matches[5] != "" {
+					comment = matches[5]
+				} else if matches[7] != "" {
+					comment = matches[7]
+				}
+				field := Field{
+					Type:    matches[1],
+					Name:    matches[2],
+					Comment: comment,
+				}
+
+				// Add the parsed field to the list of fields
+				fields = append(fields, field)
+			} else {
+				fmt.Println("no match")
 			}
 		}
 	}

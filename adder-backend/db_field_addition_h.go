@@ -176,7 +176,7 @@ func addFieldBeforeTag(
 			// Insert the new line with field details before the tag
 			newLine := ""
 			if nonDb {
-				newLine = fmt.Sprintf("  /* DEFNONDBFIELD %s %s; */ // %s", fieldType, fieldName, commentStr)
+				newLine = fmt.Sprintf("  /* DEFNONDBFLD %s %s; */ // %s", fieldType, fieldName, commentStr)
 			} else {
 				newLine = fmt.Sprintf("  %s %s // %s", fieldType, fieldName, commentStr)
 			}

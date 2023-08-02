@@ -84,7 +84,7 @@ func runServer() {
 		filename := dbname + "_definitions.h"
 		filePath := filepath.Join(srcDir, filename)
 
-		memFields, err := findRecFields(filePath)
+		memFields, err := findNondbFields(filePath)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{
 				"message": fmt.Sprintf("error parsing fields: %v", err),
