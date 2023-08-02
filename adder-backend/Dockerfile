@@ -1,5 +1,5 @@
 # Start from a minimal Alpine Linux image with Go installed
-FROM golang:1.18-alpine AS builder
+FROM golang:alpine AS builder
 
 # Install gcc and musl-dev
 RUN apk add --no-cache gcc musl-dev
