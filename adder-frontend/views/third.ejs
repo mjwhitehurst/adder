@@ -54,19 +54,25 @@
         $("#recFieldsList").empty();
 
         // Populate Memory Fields
-        data.memFields.forEach(function (field) {
-          $("#memFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
-        });
+        if (data.memFields) {  // Check if memFields is not null
+          data.memFields.forEach(function (field) {
+            $("#memFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
+          });
+        }
 
         // Populate Non-Database Fields
-        data.nondbFields.forEach(function (field) {
-          $("#nondbFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
-        });
+        if (data.nondbFields) {  // Check if nondbFields is not null
+          data.nondbFields.forEach(function (field) {
+            $("#nondbFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
+          });
+        }
 
         // Populate Record Fields
-        data.recFields.forEach(function (field) {
-          $("#recFieldsList").append(`<li>${field.type}: ${field.name}${field.comment ? " (" + field.comment + ")" : ""}</li>`);
-        });
+        if (data.recFields) {  // Check if recFields is not null
+          data.recFields.forEach(function (field) {
+            $("#recFieldsList").append(`<li>${field.type}: ${field.name}${field.comment ? " (" + field.comment + ")" : ""}</li>`);
+          });
+        }
       })
         .fail(function () {
           alert('Error fetching field data');

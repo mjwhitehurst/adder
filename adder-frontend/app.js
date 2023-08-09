@@ -47,9 +47,14 @@ app.get('/second', async (req, res) => {
   }
 });
 
-app.get('/third', async (req, res) => {
+app.get('/third', (req, res) => {
   res.render('third');
 });
+
+app.get('/fourth', (req, res) => {
+  res.render('fourth');
+});
+
 
 // Route to get the list of databases
 app.get('/databases', async (req, res) => {
@@ -76,9 +81,6 @@ app.get('/fields/:dbName', async (req, res) => {
       res.status(500).json({ message: "Failed to fetch fields." });
   }
 });
-
-
-
 
 
 
