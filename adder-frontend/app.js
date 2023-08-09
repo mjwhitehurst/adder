@@ -47,6 +47,41 @@ app.get('/second', async (req, res) => {
   }
 });
 
+app.get('/third', async (req, res) => {
+  res.render('third');
+});
+
+// Route to get the list of databases
+app.get('/databases', async (req, res) => {
+  let server = process.env.HOST_ADDRESS || "localhost";
+  try {
+      let response = await axios.get(`http://${server}:8080/dblist`);
+      res.json(response.data);  // Adjust this line
+  } catch (error) {
+      console.log("Error fetching database list: ", error);
+      res.status(500).json({ message: "Failed to fetch database list." });
+  }
+});
+
+
+
+// Route to get the fields of a specific database
+app.get('/fields/:dbName', async (req, res) => {
+  let server = process.env.HOST_ADDRESS || "localhost";
+  try {
+      let response = await axios.get(`http://${server}:8080/fields/${req.params.dbName}`);
+      res.json(response.data);
+  } catch (error) {
+      console.log("Error fetching fields: ", error);
+      res.status(500).json({ message: "Failed to fetch fields." });
+  }
+});
+
+
+
+
+
+
 app.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });

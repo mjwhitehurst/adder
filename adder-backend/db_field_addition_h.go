@@ -221,7 +221,6 @@ func addFieldBeforeTag(
 	// Get the original owner
 	uid, gid := os.Getuid(), os.Getgid()
 
-
 	// Restore the original owner to the new file
 	if err := os.Chown(filePath, uid, gid); err != nil {
 		return err

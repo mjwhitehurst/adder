@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Third</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+
+  <select id="databaseDropdown">
+    <!-- The dropdown options will be populated dynamically using JavaScript -->
+  </select>
+
+  <div id="memFieldsSection">
+    <h2>Memory Fields</h2>
+    <ul id="memFieldsList"></ul>
+  </div>
+
+  <div id="nondbFieldsSection">
+    <h2>Non-Database Fields</h2>
+    <ul id="nondbFieldsList"></ul>
+  </div>
+
+  <div id="recFieldsSection">
+    <h2>Record Fields</h2>
+    <ul id="recFieldsList"></ul>
+  </div>
+
+  <script>
+    $(document).ready(function () {
+      // Fetch database list on page load
+      $.get('/databases', function (databases) {
+        databases.forEach(function (db) {
+          $("#databaseDropdown").append(`<option value="${db}">${db}</option>`);
+        });
+      });
+
+      $("#databaseDropdown").on("change", function () {
+        alert('Dropdown value changed!');
+        var selectedDb = $(this).val();
+        fetchFieldData(selectedDb);
+      });
+    });
+
+
+
+    function fetchFieldData(dbName) {
+      $.get(`/fields/${dbName}`, function (data) {
+        // Clear existing data
+        $("#memFieldsList").empty();
+        $("#nondbFieldsList").empty();
+        $("#recFieldsList").empty();
+
+        // Populate Memory Fields
+        data.memFields.forEach(function (field) {
+          $("#memFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
+        });
+
+        // Populate Non-Database Fields
+        data.nondbFields.forEach(function (field) {
+          $("#nondbFieldsList").append(`<li>${field.type}: ${field.name}</li>`);
+        });
+
+        // Populate Record Fields
+        data.recFields.forEach(function (field) {
+          $("#recFieldsList").append(`<li>${field.type}: ${field.name}${field.comment ? " (" + field.comment + ")" : ""}</li>`);
+        });
+      })
+        .fail(function () {
+          alert('Error fetching field data');
+        });
+    }
+  </script>
+</body>
+
+</html>
