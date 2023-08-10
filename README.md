@@ -36,16 +36,15 @@ move to adder-frontend directory
 
 
 
-run (cmd line) (TODO - UPDATE THIS WITH THINGS FROM SERVER):
-docker run                        \
-    --cap-add=SYS_PTRACE          \
-    --user "$(id -u)":"$(id -u)"  \
-    -v $SRC:/app/sourcedir        \
-    adder-backend                 \
-    ADD_REC_FIELD TM Flag1 BOOLEAN hi
+run (cmd line):
+docker run                            \
+    --cap-add=SYS_PTRACE              \
+    --user "$(id -u)":"$(id -u)"      \
+    -v $SRC:/app/sourcedir            \
+     adder-backend                    \
+    GET_ALL_FIELDS TM
 
 run (server):
-
 docker run                        \
     --cap-add=SYS_PTRACE          \
     --user "$(id -u)":"$(id -u)"  \

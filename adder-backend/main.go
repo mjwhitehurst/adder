@@ -225,6 +225,12 @@ func printHelp(printMode int) {
 		fmt.Println("                <3> Field Type (int)   ")
 		fmt.Println("                <4> Optional Comment   ")
 		fmt.Println("                                       ")
+		fmt.Println("    GET_MEM_FIELDS                     ")
+		fmt.Println("    GET_REC_FIELDS                     ")
+		fmt.Println("    GET_NONDB_FIELDS                   ")
+		fmt.Println("    GET_ALL_FIELDS                     ")
+		fmt.Println("        Options: <1> Database (TM)     ")
+		fmt.Println("                                       ")
 		fmt.Println("                                       ")
 		fmt.Println("***************************************")
 	}
