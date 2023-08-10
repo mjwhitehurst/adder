@@ -21,7 +21,7 @@ func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
 	action = actionFromString(firstArg)
 
 	if action == -1 {
-		return returnStruct, errors.New("unable to determine action from argument!")
+		return returnStruct, errors.New("unable to determine action from argument")
 	}
 
 	// we are running as a command line action - look for our file from arguments.
@@ -30,17 +30,68 @@ func dbFieldAdditionFromCmdLine() (DbFieldAddition, error) {
 		return returnStruct, err
 	}
 
-	err = validateCmdLineArgs(&returnStruct)
+	err = validateCmdLineArgsFieldAddition(&returnStruct)
 	if err != nil {
 		return returnStruct, err
 	}
 
 	if err != nil || returnStruct.filePath == "" {
-		return returnStruct, errors.New("unable to build db addition struct from command line!")
+		return returnStruct, errors.New("unable to build db addition struct from command line")
 	}
 
 	return returnStruct, nil
 } /* dbFieldAdditionFromCmdLine */
+
+func dbMemInfoFromCmdLine() (string, error) {
+
+	filePath, err := findFilePathCmdLine()
+	if err != nil {
+		return "", err
+	}
+
+	memFields, err := findMemFields(filePath)
+
+	if err != nil {
+		return "", errors.New("failed to find mem fields")
+	}
+
+	fieldsStr := fieldsToString(memFields)
+	return fieldsStr, nil
+}
+
+func dbRecInfoFromCmdLine() (string, error) {
+
+	filePath, err := findFilePathCmdLine()
+	if err != nil {
+		return "", err
+	}
+
+	recFields, err := findRecFields(filePath)
+
+	if err != nil {
+		return "", errors.New("failed to find rec fields")
+	}
+
+	fieldsStr := fieldsToString(recFields)
+	return fieldsStr, nil
+}
+
+func dbNondbInfoFromCmdLine() (string, error) {
+
+	filePath, err := findFilePathCmdLine()
+	if err != nil {
+		return "", err
+	}
+
+	nondbFields, err := findNondbFields(filePath)
+
+	if err != nil {
+		return "", errors.New("failed to find nondb fields")
+	}
+
+	fieldsStr := fieldsToString(nondbFields)
+	return fieldsStr, nil
+}
 
 /**
  *  Find a definitions file from a command line argument.
@@ -57,7 +108,7 @@ func findFilePathCmdLine() (string, error) {
 	definitionsFile := findDbDefinitionsFileInDir(stringArg1, sourceDir)
 
 	if definitionsFile == "" {
-		err = errors.New("Couldn't find definitions file from arg 2")
+		err = errors.New("couldn't find definitions file from arg 2")
 	}
 
 	return definitionsFile, err
@@ -67,9 +118,9 @@ func findFilePathCmdLine() (string, error) {
  *	Go through the expected command line arguments and run their validation
  *		functions.
  */
-func validateCmdLineArgs(dataStruct *DbFieldAddition) error {
+func validateCmdLineArgsFieldAddition(dataStruct *DbFieldAddition) error {
 	if len(os.Args) < 4 {
-		return errors.New("Invalid number of arguments - use --help to find out more")
+		return errors.New("invalid number of arguments - use --help to find out more")
 	}
 
 	//dont worry about os.Args[2] - it is checked as a db name later
@@ -106,7 +157,7 @@ func validateCmdLineArgs(dataStruct *DbFieldAddition) error {
 	dataStruct.comment = commentStr
 
 	return nil
-} /* validateCmdLineArgs */
+} /* validateCmdLineArgsFieldAddition */
 
 /**
  *  TODO: validation on comments

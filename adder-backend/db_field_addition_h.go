@@ -64,52 +64,10 @@ func addRecField(filePath string, fieldName string, fieldType string, commentStr
 
 func addMemField(filePath string, fieldName string, fieldType string, commentStr string) {
 	addDatabaseField(filePath, "ADDER MEM END", fieldName, fieldType, commentStr, false)
-	return
 }
 
 func addNonDbField(filePath string, fieldName string, fieldType string, commentStr string) {
-	//TODO: like addDatabaseField, but add the whole thing as a comment
 	addDatabaseField(filePath, "ADDER NONDB END", fieldName, fieldType, commentStr, true)
-	return
-}
-
-/**
- *  Generates a filename from a given string, hoping we have enough information.
- *          DB_NAME/db_name/db_name_definitions/db_name_definitions.h
- *
- *  looks for (and returns):
- *          db_name_definitions.h
- *
- *  on fail, returns ""
- *
- */
-func definitionsFileNameFromStr(searchStr string) string {
-
-	//Null Check
-	if searchStr == "" {
-		return ""
-	}
-
-	dbFileName := ""
-
-	// Best case scenario, we are given db_name_definitions.h
-	if strings.HasSuffix(searchStr, "_definitions.h") {
-		//hooray
-		dbFileName = strings.TrimSuffix(searchStr, "_definitions.h")
-
-	} else if strings.HasSuffix(searchStr, "_definitions") {
-		//hooray
-		dbFileName = strings.TrimSuffix(searchStr, "_definitions")
-
-	} else {
-		//guess! lower case it.
-		dbFileName = strings.ToLower(searchStr)
-	}
-
-	definitionsFile := dbFileName + "_definitions.h"
-
-	//Give up
-	return definitionsFile
 }
 
 /**
@@ -117,7 +75,6 @@ func definitionsFileNameFromStr(searchStr string) string {
  * by a string. returns filePath if ok, nil/"" if not
  */
 func findDbDefinitionsFileInDir(dbName string, dirName string) string {
-
 	// Check nulls
 	if dbName == "" || dirName == "" {
 		return ""

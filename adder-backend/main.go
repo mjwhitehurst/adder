@@ -61,7 +61,7 @@ func main() {
 		action = actionFromString(firstArg)
 
 		//pre-emptively set error.
-		err = errors.New("Error using action to get data")
+		err = errors.New("error using action to get data")
 
 		switch action {
 		/* Field additions are all handled by the same functions */
@@ -71,11 +71,60 @@ func main() {
 			fallthrough
 		case actionAddNonDbField:
 			newDbFieldAddition, err = dbFieldAdditionFromCmdLine()
-			break
-
+		case actionGetMemFields:
+			printOrLog(printMode, "MEM Fields:")
+			memStr, err := dbMemInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, memStr)
+			} else {
+				printOrLog(printMode, "failed to get mem info :( ")
+			}
+			return
+		case actionGetRecFields:
+			printOrLog(printMode, "REC Fields:")
+			recStr, err := dbRecInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, recStr)
+			} else {
+				printOrLog(printMode, "failed to get rec info :( ")
+			}
+			return
+		case actionGetNondbFields:
+			printOrLog(printMode, "\nNONDB Fields:")
+			nondbStr, err := dbNondbInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, nondbStr)
+			} else {
+				printOrLog(printMode, "failed to get nondb info :(")
+			}
+			return
+		case actionGetAllFields:
+			printOrLog(printMode, "MEM Fields:")
+			memStr, err := dbMemInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, memStr)
+			} else {
+				printOrLog(printMode, "failed to get mem info :( ")
+			}
+			printOrLog(printMode, "\nREC Fields:")
+			recStr, err := dbRecInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, recStr)
+			} else {
+				printOrLog(printMode, "failed to get rec info :( ")
+			}
+			printOrLog(printMode, "\nNONDB Fields:")
+			nondbStr, err := dbNondbInfoFromCmdLine()
+			if err == nil {
+				printOrLog(printMode, nondbStr)
+			} else {
+				printOrLog(printMode, "failed to get nondb info :(")
+			}
+			return
 		//TODO: add more actions here if necessary
 
 		case -1:
+			fallthrough
 		default:
 			printHelp(printMode)
 			return
@@ -106,7 +155,7 @@ func main() {
 			newDbFieldAddition.fieldName,
 			newDbFieldAddition.fieldType,
 			newDbFieldAddition.comment)
-		break
+
 	case actionAddMemField:
 		printOrLog(printMode, "Adding MEM field. File: ", newDbFieldAddition.filePath,
 			"Field Name: ", newDbFieldAddition.fieldName,
@@ -116,7 +165,7 @@ func main() {
 			newDbFieldAddition.fieldName,
 			newDbFieldAddition.fieldType,
 			newDbFieldAddition.comment)
-		break
+
 	case actionAddNonDbField:
 		printOrLog(printMode, "Adding NONDB field. File: ", newDbFieldAddition.filePath,
 			"Field Name: ", newDbFieldAddition.fieldName,
@@ -126,10 +175,10 @@ func main() {
 			newDbFieldAddition.fieldName,
 			newDbFieldAddition.fieldType,
 			newDbFieldAddition.comment)
-		break
+
 	default:
 		printOrLog(printMode, "not given an action - exiting")
-		break
+
 	}
 
 	printOrLog(printMode, "-- Finished Process -- ")

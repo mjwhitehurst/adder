@@ -2,28 +2,42 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"regexp"
 	"strings"
 )
 
 /**
- * Takes in a file (presumed to exist)
- * and returns 3 arrays - mem rec fields
- *                        rec fields
- *											  nondb fields
+ *	A found field
  */
-func matfloDatabaseInfo(
-	filePath string) {
-
-}
-
 type Field struct {
 	Type    string `json:"type"`
 	Name    string `json:"name"`
 	Comment string `json:"comment,omitempty"`
 }
 
+/**
+ * String for a field
+ */
+func (f Field) String() string {
+	return fmt.Sprintf(" > %s - %s //%s", f.Type, f.Name, f.Comment)
+}
+
+/**
+ *	Array of fields to string
+ */
+func fieldsToString(fields []Field) string {
+	var fieldStrings []string
+	for _, field := range fields {
+		fieldStrings = append(fieldStrings, field.String())
+	}
+	return strings.Join(fieldStrings, "\n")
+}
+
+/**
+ *	Checks for fields in a mem rec structure
+ */
 func findMemFields(filePath string) ([]Field, error) {
 	// Open the file for reading
 	file, err := os.Open(filePath)
@@ -109,6 +123,9 @@ func findMemFields(filePath string) ([]Field, error) {
 	return fields, nil
 }
 
+/**
+ *	Check for fields in a Rec structure
+ */
 func findRecFields(filePath string) ([]Field, error) {
 	// Open the file for reading
 	file, err := os.Open(filePath)
@@ -210,6 +227,9 @@ func findRecFields(filePath string) ([]Field, error) {
 	return fields, nil
 }
 
+/**
+ *	Checks for nonDB fields in a rec structure
+ */
 func findNondbFields(filePath string) ([]Field, error) {
 	// Open the file for reading
 	file, err := os.Open(filePath)
