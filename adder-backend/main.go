@@ -28,13 +28,23 @@ func main() {
 
 	printOrLog(printMode, "args: ", os.Args)
 
-	// Check the number of command-line arguments
-	if len(os.Args) < 2 {
+	// Check the args - lots of args, none of which are 'dlv', mean that we're runnning as command line
+	dlvArgFound := false
+	for _, arg := range os.Args {
+		if arg == "dlv" {
+			dlvArgFound = true
+			break
+		}
+	}
+
+	printOrLog(printMode, "arguments: ", len(os.Args), " delve found? [", dlvArgFound, "]")
+
+	if len(os.Args) < 2 || dlvArgFound {
 		runMode = runModeServer
 		printOrLog(printMode, "run mode: Server")
 	} else {
 		//forcing server for now
-		runMode = runModeServer
+		runMode = runModeCmdLine
 		printOrLog(printMode, "run mode: Cmd Line")
 	}
 
