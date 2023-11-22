@@ -17,11 +17,11 @@ Install instructions for Linux (CentOS) only. Will update with other OS installs
 ## Go - Not necessary, but useful.
 Installed go by downloading:
 
-'''bash
+```bash
     sudo yum update
     wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
     sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
-
+```
 
 Added to .bashrc:
 
