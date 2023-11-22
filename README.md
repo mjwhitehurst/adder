@@ -18,13 +18,12 @@ Install instructions for Linux (CentOS) only. Will update with other OS installs
 Installed go by downloading:
 
 ```bash
-    sudo yum update
-    wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
-    sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+sudo yum update
+wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
 ```
 
 Added to .bashrc:
-
 ```bash
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
@@ -32,15 +31,13 @@ export PATH=$PATH:$GOPATH/bin
 ```
 
 Run .bashrc:
-
 ```bash
 . .bashrc
 ```
 
 Check install:
-
 ```bash
-    go version
+go version
 ```
 
 ## Docker
@@ -63,22 +60,22 @@ docker run hello-world
 
 ## Build:
 
-* Move to adder-backend directory
+* Move to adder-backend directory:
 
 ```bash
 cd ~/adder/adder-backend
 ```
-* Build the backend
+* Build the backend:
 ```bash
 docker build -t adder-backend .
 ```
 
-* Move to adder-frontend directory
+* Move to adder-frontend directory:
 ```bash
 cd ~/adder/adder-frontend
 ```
 
-* Build the frontend
+* Build the frontend:
 ```bash
 docker build -t adder-backend .
 ```
@@ -88,7 +85,7 @@ docker build -t adder-backend .
 
 You'll want to either run these in the background, or just open a terminal window for each.
 
-* Running Backend (cmd line) - Change arguments to run specific code.
+* Running Backend (cmd line) - Change arguments to run specific code:
 ```bash
 docker run                            \
     --cap-add=SYS_PTRACE              \

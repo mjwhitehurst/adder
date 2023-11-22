@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"os"
 )
@@ -43,7 +42,6 @@ func main() {
 		runMode = runModeServer
 		printOrLog(printMode, "run mode: Server")
 	} else {
-		//forcing server for now
 		runMode = runModeCmdLine
 		printOrLog(printMode, "run mode: Cmd Line")
 	}
@@ -59,9 +57,6 @@ func main() {
 
 		// Process the argument and display the result
 		action = actionFromString(firstArg)
-
-		//pre-emptively set error.
-		err = errors.New("error using action to get data")
 
 		switch action {
 		/* Field additions are all handled by the same functions */
@@ -136,7 +131,6 @@ func main() {
 		}
 
 	} else if runMode == runModeServer { // we are running as a server
-		// TODO: get the action with other data from an HTTP request
 
 		runServer()
 

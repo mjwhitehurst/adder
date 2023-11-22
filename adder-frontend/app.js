@@ -1,4 +1,5 @@
 const express = require('express');
+const expressLayouts = require('express-ejs-layouts');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const { addHttp } = require('./util');
@@ -8,7 +9,14 @@ const port = 3000;
 let defaultServer = process.env.HOST_ADDRESS || "localhost"; // renamed to defaultServer
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//EJS
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
+
+//Static Files
+app.use(express.static('public'));
+
 
 app.get('/', (req, res) => {
   res.render('index', { server: '', method: '', path: '', body: '', response: '' });
@@ -48,11 +56,11 @@ app.get('/second', async (req, res) => {
 });
 
 app.get('/third', (req, res) => {
-  res.render('third');
+  res.render('third', { title: 'Third :) Page' });
 });
 
 app.get('/fourth', (req, res) => {
-  res.render('fourth');
+  res.render('fourth', { title: 'Fourth :) Page' });
 });
 
 
