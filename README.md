@@ -25,50 +25,81 @@ Installed go by downloading:
 
 Added to .bashrc:
 
-'''bash
+```bash
 export PATH=$PATH:/usr/local/go/bin
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
+```
 
 Run .bashrc:
 
-'''bash
-    . .bashrc
+```bash
+. .bashrc
+```
 
 Check install:
 
-'''bash
+```bash
     go version
+```
 
 ## Docker
-Install docker
+Install docker:
+
+TODO_ALEX?
 
 
-add user to docker users:
+* Add user to docker users:
+```bash
 sudo groupadd docker
 sudo usermod -aG docker $USER
 newgrp docker
+```
+
+* Test if Docker has worked:
+```bash
 docker run hello-world
+```
 
-build:
+## Build:
 
-move to adder-backend directory
-touch go.sum
+* Move to adder-backend directory
+
+```bash
+cd ~/adder/adder-backend
+```
+* Build the backend
+```bash
 docker build -t adder-backend .
+```
 
-move to adder-frontend directory
+* Move to adder-frontend directory
+```bash
+cd ~/adder/adder-frontend
+```
+
+* Build the frontend
+```bash
+docker build -t adder-backend .
+```
 
 
+## Run
 
-run (cmd line):
+You'll want to either run these in the background, or just open a terminal window for each.
+
+* Running Backend (cmd line) - Change arguments to run specific code.
+```bash
 docker run                            \
     --cap-add=SYS_PTRACE              \
     --user "$(id -u)":"$(id -u)"      \
     -v $SRC:/app/sourcedir            \
      adder-backend                    \
     GET_ALL_FIELDS TM
+```
 
-run (server):
+* Running Backend (server):
+```bash
 docker run                        \
     --cap-add=SYS_PTRACE          \
     --user "$(id -u)":"$(id -u)"  \
@@ -77,18 +108,33 @@ docker run                        \
     -v $SRC:/app/sourcedir        \
     adder-backend                 \
     dlv debug --headless --listen=:2345 --api-version=2 --log
+```
 
-curls (server):
-curl -X POST http://localhost:8080/add-db-field \
-     -H 'Content-Type: application/json'        \
-     -d '{"database_name":"tm", "field_name":"MyBool", "field_type":"int", "comment":"TESTCOMMENT", "option":"NONDB"}'
 
-run frontend:
 
+* Running frontend:
+```bash
 docker run              \
   -p 8500:3000          \
   -e HOST_ADDRESS=$HOST \
   adder-frontend
+```
+
+
+## Access the functionality
+
+* Typically, you'll use the functionality on a browser.
+If you've followed the ReadMe exactly, your backend will be hosted on server:8080
+and your frontend will be hosted on server:8500
+
+
+
+* Send messages to the server with either the frontend, or curl. Here's an example:
+```bash
+curl -X POST http://localhost:8080/add-db-field \
+     -H 'Content-Type: application/json'        \
+     -d '{"database_name":"tm", "field_name":"MyBool", "field_type":"int", "comment":"TESTCOMMENT", "option":"NONDB"}'
+```
 
 
 
