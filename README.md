@@ -1,23 +1,47 @@
-# adder
-to automate simple code changes on a system with certain system layouts.
+# Adder
+A Command Line + Server tool to automate simple code changes on a Matflo System
+Install instructions for Linux (CentOS) only. Will update with other OS installs as we do them.
+
+## System Requirements
+
+* Docker Engine >= 24.0.4
+* OS able to install go >= 1.16.4
+* Existing Directories: ~/source
+* Source directory containing Matflo files - currently only xxx_definitions.h files edited
 
 
 
-# this is just my notepad of what to do. think I'm going to put go install into the docker image so can run anywhere docker can
-installed go by downloading:
 
-sudo yum update
-wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
-sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
+# Installation
 
-added to .bashrc:
-export PATH=$PATH:/usr/local/go/bin
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
+## Go - Not necessary, but useful.
+Installed go by downloading:
 
-run .bashrc, then run
-go version
+'''bash
+    sudo yum update
+    wget https://dl.google.com/go/go1.16.4.linux-amd64.tar.gz
+    sudo tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
 
+
+Added to .bashrc:
+
+'''bash
+    export PATH=$PATH:/usr/local/go/bin
+    export GOPATH=$HOME/go
+    export PATH=$PATH:$GOPATH/bin
+
+Run .bashrc:
+
+'''bash
+    . .bashrc
+
+Check install:
+
+'''bash
+    go version
+
+## Docker
+Install docker
 
 
 add user to docker users:

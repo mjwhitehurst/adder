@@ -93,7 +93,7 @@ func definitionsFileNameFromStr(searchStr string) string {
 }
 
 /**
- * TODO: make this log somewhere for when used as a server
+ * TODO_MATT: make this log somewhere for when used as a server
  */
 func printOrLog(printMode int, msg ...interface{}) {
 
