@@ -43,8 +43,22 @@ go version
 ## Docker
 Install docker:
 
-TODO_ALEX?
+1) use 'docker version' to check which version of docker you are on, 
+we want to be on at least version 24.0.7 . If docker is installed but on an old version
+follow the below steps if not skip to step No.4
 
+2) list the installed docker packages: sudo yum list installed | grep docker
+
+3) remove all installed packages: sudo yum remove YourDockerPackageNames
+
+4) add the new docker engine repo: sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+
+5) install docker packages from repo: sudo yum install docker-ce docker-ce-cli containerd.io    docker-buildx-plugin docker-compose-plugin
+
+6) check the correct docker version is installed using the command from step 1
+   then startup docker: sudo systemctl start docker
+
+7) Test docker is running correctly: sudo docker run hello-world
 
 * Add user to docker users:
 ```bash
