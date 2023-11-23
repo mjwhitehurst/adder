@@ -135,7 +135,7 @@ func addFieldBeforeTag(
 			if nonDb {
 				newLine = fmt.Sprintf("  /* DEFNONDBFLD %s %s; */ // %s", fieldType, fieldName, commentStr)
 			} else {
-				newLine = fmt.Sprintf("  %s %s // %s", fieldType, fieldName, commentStr)
+				newLine = fmt.Sprintf("  %s %s; // %s", fieldType, fieldName, commentStr)
 			}
 
 			// Write the new line with field details
