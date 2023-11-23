@@ -1,5 +1,5 @@
 # Specify the base image
-FROM node:14
+FROM node:latest
 
 # Set the working directory in the container to /app
 WORKDIR /app

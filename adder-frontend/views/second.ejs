@@ -1,36 +1,25 @@
-<!DOCTYPE html>
-<html>
+<h2>Routes</h2>
+<ul>
+  <% for(let route of routes) { %>
+    <li>
+      <%= route.method %>
+        <%= route.path %>
+          <% if (route.method==='GET' ) { %>
+            <button class="api-button" data-route="<%= route.path %>">Test</button>
+            <% } %>
+    </li>
+    <% } %>
+</ul>
 
-<head>
-  <title>Second Page</title>
-</head>
+<h2>API Response</h2>
+<pre id="apiResponse"></pre>
 
-<body>
-  <h2>Routes</h2>
-  <ul>
-    <% for(let route of routes) { %>
-      <li>
-        <%= route.method %>
-          <%= route.path %>
-            <% if (route.method==='GET' ) { %>
-              <button class="api-button" data-route="<%= route.path %>">Test</button>
-              <% } %>
-      </li>
-      <% } %>
-  </ul>
-
-  <h2>API Response</h2>
-  <pre id="apiResponse"></pre>
-
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-  <script>
-    $('.api-button').click(function () {
-      const route = $(this).data('route');
-      $.get(`http://mawhit1:8080${route}`, function (data, status) {
-        $('#apiResponse').text(JSON.stringify(data, null, 2));
-      });
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $('.api-button').click(function () {
+    const route = $(this).data('route');
+    $.get(`http://mawhit1:8080${route}`, function (data, status) {
+      $('#apiResponse').text(JSON.stringify(data, null, 2));
     });
-  </script>
-</body>
-
-</html>
+  });
+</script>

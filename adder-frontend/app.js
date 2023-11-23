@@ -1,4 +1,5 @@
 const express = require('express');
+const expressLayouts = require('express-ejs-layouts');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 const { addHttp } = require('./util');
@@ -8,22 +9,29 @@ const port = 3000;
 let defaultServer = process.env.HOST_ADDRESS || "localhost"; // renamed to defaultServer
 
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//EJS
 app.set('view engine', 'ejs');
+app.use(expressLayouts);
+
+//Static Files
+app.use(express.static('public'));
+
 
 app.get('/', (req, res) => {
-  res.render('index', { server: '', method: '', path: '', body: '', response: '' });
+  res.render('index', { title: 'Adder', server: '', method: '', path: '', secondbody: '', response: '' });
 });
 
 app.post('/', async (req, res) => {
-  let { server, method, path, body } = req.body;
+  let { server, method, path, secondbody } = req.body;
   server = addHttp(server || defaultServer);
 
   try {
-    let response = await axios({ method, url: server + path, data: body });
+    let response = await axios({ method, url: server + path, data: secondbody });
     console.log(response.data);  // Log the response data
-    res.render('index', { server, method, path, body, response: JSON.stringify(response.data, null, 2) });
+    res.render('index', { server, method, path, secondbody, response: JSON.stringify(response.data, null, 2) });
   } catch (error) {
-    res.render('index', { server, method, path, body, response: JSON.stringify({ message: error.message, stack: error.stack }, null, 2) });
+    res.render('index', { server, method, path, secondbody, response: JSON.stringify({ message: error.message, stack: error.stack }, null, 2) });
   }
 });
 
@@ -36,7 +44,7 @@ app.get('/second', async (req, res) => {
     try {
       let response = await axios.get(addHttp(server + ':8080/routes'));
       let routes = response.data.routes;
-      res.render('second', { response: testResponse.data, routes });
+      res.render('second', { title: 'Server Routes', response: testResponse.data, routes });
     } catch (error) {
       console.log("Error getting routes: ", error);
       res.render('error', { error: JSON.stringify(error, null, 2) });
@@ -48,11 +56,11 @@ app.get('/second', async (req, res) => {
 });
 
 app.get('/third', (req, res) => {
-  res.render('third');
+  res.render('third', { title: 'Third :) Page' });
 });
 
 app.get('/fourth', (req, res) => {
-  res.render('fourth');
+  res.render('fourth', { title: 'Fourth :) Page' });
 });
 
 
