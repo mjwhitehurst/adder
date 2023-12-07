@@ -62,11 +62,14 @@ case "$1" in
         shift # Remove the first argument
         # Run backend.sh with remaining arguments
         eval ". ${adder_path}/adder-backend/backend.sh $@ &"
+        exit 0
         ;;
     frontend)
         shift # Remove the first argument
         # Run frontend.sh with remaining arguments
         eval ". ${adder_path}/adder-frontend/frontend.sh $@ &"
+        exit 0
+
         ;;
     start)
         # Run backend.sh and frontend.sh with 'default' argument
@@ -74,6 +77,8 @@ case "$1" in
         eval ". ${adder_path}/adder-backend/backend.sh default"
         echo -e "${GREEN} starting backend"
         eval ". ${adder_path}/adder-frontend/frontend.sh default"
+        exit 0
+
         ;;
     kill)
         # Kill both frontend and backend processes
@@ -82,6 +87,18 @@ case "$1" in
         echo -e "${RED} killing fronend"
         kill_container "adder-frontend"
         echo -e "${NC}"
+        exit 0
+        ;;
+    build)
+        echo -e "${AMBER} - Rebuilding adder script... ${NC}"
+        eval ". build_adder_script.sh"
+        echo -e "${GREEN}done"
+        echo -e "${AMBER} - building backend"
+        eval "docker build -t adder-backend ${adder_path}/adder-backend"
+        echo -e "${GREEN}done"
+        echo -e "${AMBER} - building frontend"
+        eval "docker build -t adder-frontend ${adder_path}/adder-backend"
+        echo -e "${GREEN}done"
         ;;
     *)
         echo -e "${RED}Invalid argument: $1${NC}"
@@ -90,6 +107,6 @@ case "$1" in
         ;;
 esac
 
-echo -e "${GREEN}Adder Script done${NC}"
+echo -e "${GREEN}Adder Script finished${NC}"
 
 
