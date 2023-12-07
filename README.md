@@ -73,7 +73,20 @@ docker run hello-world
 ```
 
 ## Build:
+Choose one:
+### Default (Auto)
 
+   * First, set things up. Head to the adder directory, and run:
+    ```bash
+    . build adder_script.sh
+    ```
+
+   * Next, use 'adder' to build everything:
+   ```bash
+   adder build
+   ```
+
+### Manual
 * Move to adder-backend directory:
 
 ```bash
@@ -97,6 +110,22 @@ docker build -t adder-backend .
 
 ## Run
 
+### Default (Auto)
+(If you have not used adder_build_script.sh use Manual)
+
+   * Use Adder to run the docker images:
+   ```bash
+   adder frontend ## for frontend only
+   adder backend ## for backend only 
+   adder start  ## for both
+   ```
+
+   * You can also kill everything using:
+   ```bash
+   adder kill
+   ```
+
+### Manual
 You'll want to either run these in the background, or just open a terminal window for each.
 
 * Running Backend (cmd line) - Change arguments to run specific code:
@@ -120,7 +149,6 @@ docker run                        \
     adder-backend                 \
     dlv debug --headless --listen=:2345 --api-version=2 --log
 ```
-
 
 
 * Running frontend:
