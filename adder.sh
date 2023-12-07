@@ -52,7 +52,7 @@ fi
 
 # Check if at least one argument is provided
 if [ $# -lt 1 ]; then
-    echo -e "${AMBER}Usage: $0 [backend|frontend|start] [...]${NC}"
+    echo -e "${AMBER}Usage: $0 [backend|frontend|start|kill] [...]${NC}"
     exit 1
 fi
 
@@ -72,11 +72,11 @@ case "$1" in
 
         ;;
     start)
-        # Run backend.sh and frontend.sh with 'default' argument
+        # Run backend.sh and frontend.sh
         echo -e "${GREEN} starting frontend"
-        eval ". ${adder_path}/adder-backend/backend.sh default"
+        eval "adder frontend"
         echo -e "${GREEN} starting backend"
-        eval ". ${adder_path}/adder-frontend/frontend.sh default"
+        eval "adder backend"
         exit 0
 
         ;;
@@ -97,7 +97,7 @@ case "$1" in
         eval "docker build -t adder-backend ${adder_path}/adder-backend"
         echo -e "${GREEN}done"
         echo -e "${AMBER} - building frontend"
-        eval "docker build -t adder-frontend ${adder_path}/adder-backend"
+        eval "docker build -t adder-frontend ${adder_path}/adder-frontend"
         echo -e "${GREEN}done"
         ;;
     *)

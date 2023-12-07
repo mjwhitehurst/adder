@@ -38,12 +38,12 @@ fi
 
 # Run Docker command
 echo -e "${GREEN}Running Docker container...${NC}"
-command="docker run ${DOCKER_ARGS} adder-frontend ${ADDER_ARGS} &"
+command="docker run ${DOCKER_ARGS} adder-frontend ${ADDER_ARGS}"
 
 echo -e "${AMBER}Executing command: ${command}${NC}"
 
 # Execute the command
-eval "$command"
+eval "$command &"
 
 
 if [ $? -eq 0 ]; then

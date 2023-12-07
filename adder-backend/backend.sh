@@ -36,7 +36,7 @@ command="docker run ${DOCKER_ARGS} adder-backend ${ADDER_ARGS}"
 echo -e "${AMBER}Executing command: ${command}${NC}"
 
 # Execute the command
-eval "$command" &
+eval "$command &"
 
 
 if [ $? -eq 0 ]; then
