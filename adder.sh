@@ -139,7 +139,8 @@ case "$1" in
     cd)
         success " Adder ⤵⤵⤵"
         cd ~/adder
-        [ $? == 1 ] && err ">FAILED<" && $exit_adder 1        $exit_adder 0
+        [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
+        $exit_adder 0
         ;;
     *)
         err "Invalid argument: $1"
