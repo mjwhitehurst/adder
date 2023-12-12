@@ -117,10 +117,18 @@ case "$1" in
         $exit_adder 0
         ;;
     build)
-        warn " - Rebuilding adder script..."
-        eval ". build_adder_script.sh"
-        [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
-        success "done"
+        # When we run build, we intend to come here twice.
+        #  once with the 'current' stuff to move the 'new' code into $BIN
+        if [ "$2" != "-skip_script_build" ]; then
+            warn " - Rebuilding adder script..."
+            eval ". build_adder_script.sh"
+            [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
+            success "done"
+            #then the second time, so we are running the 'new' code when building.
+            eval "adder build -skip_script_build" # <-- so this...
+            $exit_adder $?
+        fi
+        # will take us here.
         warn " - building backend NEW"
         eval "docker build -t adder-backend ${adder_path}/adder-backend"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
