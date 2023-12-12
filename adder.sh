@@ -92,7 +92,6 @@ case "$1" in
         eval ". ${adder_path}/adder-frontend/frontend.sh $@ &"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         $exit_adder 0
-
         ;;
     start)
         # Run backend.sh and frontend.sh
@@ -104,7 +103,6 @@ case "$1" in
         eval "adder backend"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         $exit_adder 0
-
         ;;
     kill)
         # Kill both frontend and backend processes
