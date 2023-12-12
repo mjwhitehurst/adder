@@ -380,11 +380,11 @@ case "$1" in
         fi
 
         warn " - building backend"
-        #eval "docker build -t adder-backend ${adder_path}/adder-backend"
+        eval "docker build -t adder-backend ${adder_path}/adder-backend"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         success "done"
         warn " - building frontend"
-        #eval "docker build -t adder-frontend ${adder_path}/adder-frontend"
+        eval "docker build -t adder-frontend ${adder_path}/adder-frontend"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         success "done"
         ;;
