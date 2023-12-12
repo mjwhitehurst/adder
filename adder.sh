@@ -8,6 +8,13 @@ AMBER='\033[0;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+## not a function, but 'overrides' for exit and return in diff situations.
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+        exit_adder='exit'
+    else
+        exit_adder='return'
+fi
+
 ### FUNCTIONS ###
 
 # Coloured text
@@ -73,13 +80,124 @@ function printbuildhelp(){
     warn " --------------"
 }
 
+function printbackendhelp(){
+    warn " -- BACKEND  -- "
+    warn ""
+    warn "  Anything passed in after 'adder backend' will be passed to 'docker run' "
+    warn "      If you're changing these, you'll need to know how 'backend.sh' will take them."
+    warn ""
+    warn "      Pass them in as 2 strings, i.e. adder backend \" -my -docker -args\" \" -my -adder -args\""
+    warn ""
+    warn "      so that we run 'docker run <docker args> adder-backend <adder args>"
+    warn ""
+    warn " --------------"
+}
 
-## not a function, but 'overrides' for exit and return in diff situations.
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-        exit_adder='exit'
-    else
-        exit_adder='return'
-fi
+function printfrontendhelp(){
+    warn " -- FRONTEND -- "
+    warn ""
+    warn "  Anything passed in after 'adder frontend' will be passed to 'docker run' "
+    warn "      If you're changing these, you'll need to know how 'frontend.sh' will take them."
+    warn ""
+    warn "      Pass them in as 2 strings, i.e. adder frontend \" -my -docker -args\" \" -my -adder -args\""
+    warn ""
+    warn "      so that we run 'docker run <docker args> adder-frontend <adder args>"
+    warn ""
+    warn " --------------"
+}
+
+function printstarthelp(){
+    warn " --- START  --- "
+    warn ""
+    warn "  Kicks off adder processes with default arguments"
+    warn ""
+    warn " --------------"
+}
+
+function printkillhelp(){
+    warn " ---- KILL ---- "
+    warn ""
+    warn "  uses 'docker ps' to find any running adder containers"
+    warn "      then kills them with 'docker stop' "
+    warn ""
+    warn " --------------"
+}
+
+function printclearuphelp(){
+    warn " -- CLEARUP  -- "
+    warn ""
+    warn ""
+    warn "  Uses docker container pruning"
+    warn ""
+    warn "      TODO: expand :)"
+    warn ""
+    warn ""
+    warn " --------------"
+}
+
+function printhelphelp(){
+    warn " ---- HELP ---- "
+    warn "       :()      "
+    warn " -------------- "
+}
+
+function printhelp()
+{
+    case "$2" in
+    backend)
+        printbackendhelp
+        ;;
+    frontend)
+        printfrontendhelp
+        ;;
+    start)
+        printstarthelp
+        ;;
+    kill)
+        printkillhelp
+        ;;
+    clearup)
+        printclearuphelp
+        ;;
+    build)
+        printbuildhelp
+        ;;
+    help)
+        printhelphelp
+        ;;
+    *) ##Default - print help
+    warn "=== ADDER SCRIPTING ==="
+    warn ""
+    warn "start"
+    warn "      Starts up the latest built docker containers in the background"
+    warn ""
+    warn "backend"
+    warn "      Starts up the latest built backend container"
+    warn ""
+    warn "frontend"
+    warn "      Starts up the latest built frontend container"
+    warn ""
+    warn "kill"
+    warn "      Finds and kills any docker containers associated with adder"
+    warn ""
+    warn "clearup"
+    warn "      Clears up adder-based disk space (mostly docker)"
+    warn ""
+    warn "build"
+    warn "      Builds adder docker binaries and sets up scripts"
+    warn ""
+    warn "help"
+    warn "      Prints this helptext. use with other commands to see details"
+    warn "              i.e. adder help start"
+    warn ""
+    warn ""
+    warn "========================"
+    esac
+
+    $exit_adder 0
+}
+
+
 
 # Function to kill a Docker container by image name
 function kill_container() {
@@ -156,6 +274,7 @@ function check_valid_args() {
     fi
 }
 
+
 ### START OF ACTUAL SCRIPT ###
 
 # Check current directory and get adder directory
@@ -177,12 +296,15 @@ fi
 
 # Check if at least one argument is provided
 if [ $# -lt 1 ]; then
-    warn "Usage: $0 [backend|frontend|start|kill] [...]"
+    warn "Usage: $0 [backend|frontend|start|kill|cd|clearup] [...]"
     $exit_adder 1
 fi
 
 # Handle the first argument
 case "$1" in
+    help)
+        printhelp $@
+        ;;
     backend)
         shift # Remove the first argument
         # Run backend.sh with remaining arguments
@@ -217,6 +339,14 @@ case "$1" in
         kill_container "adder-frontend"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         $exit_adder 0
+        ;;
+    clearup)
+    #TODO: make this take arguments to choose how hard to go with the cleanup
+        docker container prune -f
+        docker image prune -a -f
+        docker volume prune -f
+        docker network prune -f
+        docker builder prune -f
         ;;
     build)
         #check args
