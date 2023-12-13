@@ -308,14 +308,14 @@ case "$1" in
     backend)
         shift # Remove the first argument
         # Run backend.sh with remaining arguments
-        eval ". ${adder_path}/adder-backend/backend.sh $@ &"
+        eval "adder_backend $@ &"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         $exit_adder 0
         ;;
     frontend)
         shift # Remove the first argument
         # Run frontend.sh with remaining arguments
-        eval ". ${adder_path}/adder-frontend/frontend.sh $@ &"
+        eval "adder_frontend $@ &"
         [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
         $exit_adder 0
         ;;
@@ -365,7 +365,7 @@ case "$1" in
         #  once with the 'current' stuff to move the 'new' code into $BIN
         if ! [[ " $* " =~ " -ssb " ]] && ! [[ " $* " =~ " -skip_script_build " ]]; then
             warn " - Rebuilding adder script..."
-            eval ". build_adder_script.sh"
+            eval ". $adder_path/build_adder_script.sh"
             [ $? == 1 ] && err ">FAILED<" && $exit_adder 1
             success "done"
             #then the second time, so we are running the 'new' code when building.

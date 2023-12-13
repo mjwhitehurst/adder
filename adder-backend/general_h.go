@@ -93,6 +93,20 @@ func definitionsFileNameFromStr(searchStr string) string {
 }
 
 /**
+ *	Set up log file(s)
+ */
+func setUpLogFiles(printMode int) error {
+
+	// Sometimes we don't need log files...
+	if printMode == printModeNone ||
+		printMode == printModeScreen {
+		return nil
+	}
+
+	return nil
+}
+
+/**
  * TODO_MATT: make this log somewhere for when used as a server
  */
 func printOrLog(printMode int, msg ...interface{}) {

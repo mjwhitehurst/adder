@@ -68,12 +68,37 @@ fi
 # Path to the adder.sh script
 adder_script="./adder.sh"
 
+adder_backend="./adder-backend/backend.sh"
+adder_frontend="./adder-frontend/frontend.sh"
+
+
 # Move to $BIN
 cp "$adder_script" "$BIN/adder"
 chmod a+x $BIN/adder
+
 
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}adder moved to $BIN${NC}"
 else
     echo -e "${RED}Failed to move adder.sh${NC}"
+fi
+
+cp "$adder_frontend" "$BIN/adder_frontend"
+chmod a+x $BIN/adder_frontend
+
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}adder_frontend moved to $BIN${NC}"
+else
+    echo -e "${RED}Failed to move adder_frontend.sh${NC}"
+fi
+
+cp "$adder_backend" "$BIN/adder_backend"
+chmod a+x $BIN/adder_backend
+
+
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}adder_backend moved to $BIN${NC}"
+else
+    echo -e "${RED}Failed to move adder_frontend.sh${NC}"
 fi

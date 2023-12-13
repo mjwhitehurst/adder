@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 const (
@@ -16,12 +19,28 @@ const (
 /* Main function                                         */
 /*#######################################################*/
 func main() {
+
+	var err error
+
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
+
+	log.Error().Msg("Error message")
+	log.Warn().Msg("Warning message")
+	log.Info().Msg("Info message")
+	log.Debug().Msg("Debug message")
+	log.Trace().Msg("Trace message")
+
 	// Run mode
 	runMode := runModeUnknown
 	printMode := printModeNone
 	action := -1
 
 	printMode = printModeScreen
+
+	err = setUpLogFiles(printMode)
+	if err != nil {
+		//PANIC
+	}
 
 	printOrLog(printMode, "-- Starting Process -- ")
 
@@ -47,7 +66,6 @@ func main() {
 	}
 
 	var newDbFieldAddition DbFieldAddition
-	var err error
 
 	/* If we're command-line run, then work out what we're doing. */
 	if runMode == runModeCmdLine {
