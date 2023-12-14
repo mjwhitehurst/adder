@@ -125,7 +125,7 @@ func setUpLogFiles(printMode int) error {
 }
 
 /**
- * TODO_MATT: make this log somewhere for when used as a server
+ * Basic info logging for whole program
  */
 func printOrLog(printMode int, msg ...interface{}) {
 
@@ -136,6 +136,7 @@ func printOrLog(printMode int, msg ...interface{}) {
 		fmt.Println(msg...)
 		return
 	case printModeLog:
+		log.Info().Msg(fmt.Sprint(msg...))
 		return
 
 	default:

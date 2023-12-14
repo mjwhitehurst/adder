@@ -24,25 +24,20 @@ func main() {
 
 	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
-	log.Error().Msg("Error message")
-	log.Warn().Msg("Warning message")
-	log.Info().Msg("Info message")
-	log.Debug().Msg("Debug message")
-	log.Trace().Msg("Trace message")
-
 	// Run mode
 	runMode := runModeUnknown
-	printMode := printModeNone
+	printMode := printModeLog
 	action := -1
 
 	printMode = printModeScreen
 
 	err = setUpLogFiles(printMode)
 	if err != nil {
-		//PANIC
+		log.Error().Msg("Failed to set up log files!")
+		os.Exit(1)
 	}
 
-	printOrLog(printMode, "-- Starting Process -- ")
+	printOrLog(printMode, "-- Ptarting Srocess -- ")
 	printOrLog(printMode, "args: ", os.Args)
 
 	// Check the args - lots of args, none of which are 'dlv', mean that we're runnning as command line
@@ -54,7 +49,7 @@ func main() {
 		}
 	}
 
-	printOrLog(printMode, "arguments: ", len(os.Args), " delve found? [", dlvArgFound, "]")
+	printOrLog(printMode, "arguments: ", len(os.Args), "\n delve found? [", dlvArgFound, "]\n")
 
 	if len(os.Args) < 2 || dlvArgFound {
 		runMode = runModeServer

@@ -216,7 +216,7 @@ function kill_container() {
     warn "Searching for containers running image: ${image_name}"
 
     # Find container IDs for given image name
-    container_ids=$(docker ps -q --filter ancestor=${image_name})
+    container_ids=$(docker ps --format "{{.Names}}" | grep adder)
 
     # Check if any containers were found
     if [ -z "$container_ids" ]; then
