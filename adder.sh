@@ -135,6 +135,14 @@ function printclearuphelp(){
     warn " --------------"
 }
 
+function printpshelp(){
+    warn " ----- PS ----- "
+    warn ""
+    warn "       Lists running adder containers"
+    warn ""
+    warn " -------------- "
+}
+
 function printhelphelp(){
     warn " ---- HELP ---- "
     warn "       :()      "
@@ -161,6 +169,9 @@ function printhelp()
         ;;
     build)
         printbuildhelp
+        ;;
+    ps)
+        printpshelp
         ;;
     help)
         printhelphelp
@@ -279,17 +290,25 @@ function check_valid_args() {
 
 # Check current directory and get adder directory
 current_dir=$(basename "$PWD")
-base_dir=$(basename "$current_path")
-if [[ "$base_dir" == "adder" ]]; then
-    adder_path="$current_path"
+parent_dir=$(basename "$(dirname "$PWD")")
+
+if [[ "$current_dir" == "adder" ]]; then
+    adder_path="$PWD"
+elif [[ "$parent_dir" == "adder" ]]; then
+    adder_path="$(dirname "$PWD")"
 else
-    adder_path=$(dirname "$current_path")
+    adder_path="$PWD"  # Default to current directory if not inside or directly in 'adder'
 fi
 
 #Aliases etc.
 set_up_bashrc
 
-if [[ "$current_dir" != "adder" && "$current_dir" != "adder-backend" && "$current_dir" != "adder-frontend" && "$1" != "cd" ]]; then
+if [[ "$current_dir" != "adder" &&
+      "$current_dir" != "adder-backend" &&
+      "$current_dir" != "adder-frontend" &&
+      "$1" != "cd" &&
+      "$1" != "ps" &&
+      "$1" != "shell" ]]; then
     err "Error: This script must be run from a directory named adder, adder-backend, or adder-frontend."
     $exit_adder 1
 fi
@@ -347,6 +366,36 @@ case "$1" in
         docker volume prune -f
         docker network prune -f
         docker builder prune -f
+        ;;
+    ps)
+        if [ $# -gt 0 ]; then #if we're given arguments
+            #check they're accepted:
+            valid_args=(    "ps" "both"
+                            "-frontend" "-f" "frontend"
+                            "-backend"  "-b" "backend" )
+
+            check_valid_args "${valid_args[@]}" -- "$@"
+
+            [ $? == 1 ] && printpshelp && $exit_adder 1
+
+        fi
+
+        if ! [[ " $* " =~ " -both " ]] && ! [[ " $* " =~ " -skip_script_build " ]]; then
+            success "Listing all adder containers:"
+            docker ps
+        fi
+        ;;
+    shell)
+        # Find a running container where the name includes proc_name
+        container_id=$(docker ps --format "{{.Names}}" | grep "$2" | head -n 1)
+
+        if [[ -n $container_id ]]; then
+            # Attach to the container's shell
+            docker exec -it $container_id sh
+        else
+            err "No running container found with name including: $2"
+            $exit_adder 1
+        fi
         ;;
     build)
         #check args

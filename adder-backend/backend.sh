@@ -13,7 +13,9 @@ print_usage() {
 }
 
 # Default Docker arguments
-DEFAULT_DOCKER_ARGS="--cap-add=SYS_PTRACE --user \"$(id -u):$(id -u)\" -p 8080:8080 -p 2345:2345 -v $SRC:/app/sourcedir"
+#take a hash of current time so instances have unique names - doesn't have to be secure, just unique enough
+md5time=$(date +%s%N | xxd -p | tail -c 7)
+DEFAULT_DOCKER_ARGS="--name adder-backend-${md5time} --cap-add=SYS_PTRACE --user \"$(id -u):$(id -u)\" -p 8080:8080 -p 2345:2345 -v $SRC:/app/sourcedir"
 
 # Default ADDER argument
 DEFAULT_ADDER_ARGS="dlv debug --headless --listen=:2345 --api-version=2 --log"

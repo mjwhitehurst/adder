@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strings"
+
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 // Define all the actions here
@@ -103,6 +107,20 @@ func setUpLogFiles(printMode int) error {
 		return nil
 	}
 
+	zeroLogFile, err := os.OpenFile(
+		"adder_backend.log",
+		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
+		0664)
+
+	if err != nil {
+		return err
+	}
+
+	multi := zerolog.MultiLevelWriter(os.Stdout, zeroLogFile)
+
+	log.Logger = zerolog.New(multi).With().Timestamp().Logger()
+
+	log.Info().Msg("Log file created successfully")
 	return nil
 }
 

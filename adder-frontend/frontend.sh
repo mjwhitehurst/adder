@@ -12,15 +12,9 @@ print_usage() {
     echo -e "${AMBER}If no arguments or 'default' is provided, a default Docker run command will be used.${NC}"
 }
 
-
-docker run              \
-  -p 8500:3000          \
-  -e HOST_ADDRESS=$HOST \
-  adder-frontend
-
-
 # Default Docker arguments
-DEFAULT_DOCKER_ARGS="-p 8500:3000 -e HOST_ADDRESS=$HOST"
+md5time=$(date +%s%N | xxd -p | tail -c 7)
+DEFAULT_DOCKER_ARGS="--name adder-frontend-${md5time} -p 8500:3000 -e HOST_ADDRESS=$HOST"
 
 # Default ADDER argument
 DEFAULT_ADDER_ARGS=" "
@@ -35,7 +29,7 @@ else
     # Remove the last argument to get DOCKER_ARGS
     DOCKER_ARGS="${@:1:$#-1}"
 fi
-
+echo hi
 # Run Docker command
 echo -e "${GREEN}Running Docker container...${NC}"
 command="docker run ${DOCKER_ARGS} adder-frontend ${ADDER_ARGS}"

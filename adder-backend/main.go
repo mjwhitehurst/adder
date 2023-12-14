@@ -43,7 +43,6 @@ func main() {
 	}
 
 	printOrLog(printMode, "-- Starting Process -- ")
-
 	printOrLog(printMode, "args: ", os.Args)
 
 	// Check the args - lots of args, none of which are 'dlv', mean that we're runnning as command line

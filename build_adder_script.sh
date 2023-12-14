@@ -21,10 +21,16 @@ create_directory() {
 ##START OF MAIN SCRIPT ##
 
 
-# Check if the current directory is 'adder'
+
 current_dir=$(basename "$PWD")
-if [ "$current_dir" != "adder" ]; then
-    echo -e "${RED}This script must be run from the 'adder' directory. Exiting.${NC}"
+parent_dir=$(basename "$(dirname "$PWD")")
+
+if [[ "$current_dir" == "adder" ]]; then
+    adder_path="$PWD"
+elif [[ "$parent_dir" == "adder" ]]; then
+    adder_path="$(dirname "$PWD")"
+else
+    adder_path="$PWD"  # Default to current directory if not inside or directly in 'adder'
 fi
 
 # Check if $BIN is set and if it exists
@@ -66,10 +72,10 @@ else
     fi
 fi
 # Path to the adder.sh script
-adder_script="./adder.sh"
+adder_script="${adder_path}/adder.sh"
 
-adder_backend="./adder-backend/backend.sh"
-adder_frontend="./adder-frontend/frontend.sh"
+adder_backend="${adder_path}/adder-backend/backend.sh"
+adder_frontend="${adder_path}/adder-frontend/frontend.sh"
 
 
 # Move to $BIN
